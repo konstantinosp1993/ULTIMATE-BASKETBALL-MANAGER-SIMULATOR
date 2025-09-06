@@ -1,0 +1,1797 @@
+<!DOCTYPE html>
+<html lang="el">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ultimate Basketball Manager Simulator</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap');
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #1f2937;
+            color: #e5e7eb;
+        }
+        .container {
+            max-width: 1400px;
+        }
+        .card {
+            background-color: #374151;
+            border-radius: 1rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+            padding: 1.5rem;
+        }
+        .header {
+            background-color: #1f2937;
+            color: white;
+            padding: 1rem;
+            border-radius: 1rem;
+            margin-bottom: 1.5rem;
+            text-align: center;
+        }
+        .tab-container {
+            background-color: #2d3748;
+            padding: 0.5rem;
+            border-radius: 1rem;
+            margin-bottom: 1.5rem;
+            display: flex;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+        .btn-tab {
+            background-color: transparent;
+            color: #a0aec0;
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.75rem;
+            transition: background-color 0.2s, color 0.2s;
+            font-weight: 600;
+        }
+        .btn-tab.active {
+            background-color: #4a5568;
+            color: white;
+        }
+        .table-container {
+            overflow-x: auto;
+            border-radius: 0.75rem;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.875rem;
+        }
+        th, td {
+            padding: 0.75rem 0.5rem;
+            text-align: left;
+        }
+        th {
+            background-color: #4a5568;
+            font-weight: 600;
+            color: #cbd5e0;
+            text-transform: uppercase;
+        }
+        tbody tr:nth-child(even) {
+            background-color: #2d3748;
+        }
+        #boxscoreTableA thead tr:first-child th,
+        #boxscoreTableB thead tr:first-child th {
+             background-color: #1e293b;
+            color: white;
+            text-align: center;
+            font-size: 1.125rem;
+            padding: 0.75rem;
+        }
+        tfoot tr {
+            background-color: #1e293b !important;
+            font-weight: bold;
+            border-top: 2px solid #4a5568;
+        }
+        .input-text, .input-number {
+            background-color: #4a5568;
+            color: white;
+            border: 1px solid #6b7280;
+            border-radius: 0.5rem;
+            padding: 0.5rem;
+            text-align: center;
+        }
+        .btn-primary {
+            background-color: #10b981;
+            color: white;
+            transition: background-color 0.2s;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.2);
+        }
+        .btn-primary:hover {
+            background-color: #059669;
+        }
+        .score-board {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 2rem;
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: white;
+        }
+        .score-board .score {
+            min-width: 60px;
+            text-align: center;
+        }
+        .score-board .team-name {
+            font-size: 1.5rem;
+            color: #a0aec0;
+        }
+        .score-board .team-info {
+            width: 200px;
+        }
+        .score-board .team-info.text-right {
+            text-align: right;
+        }
+        .score-board .team-info.text-left {
+            text-align: left;
+        }
+        .log-entry {
+            padding: 0.5rem;
+            border-bottom: 1px solid #4a5568;
+        }
+        .log-entry:last-child {
+            border-bottom: none;
+        }
+        .loading-spinner {
+            border: 4px solid rgba(255, 255, 255, 0.1);
+            border-left-color: #10b981;
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        .select-multiple-container {
+            position: relative;
+            width: 100%;
+        }
+        .select-multiple-dropdown {
+            display: none;
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background-color: #374151;
+            border-radius: 0.5rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+            border: 1px solid #4a5568;
+            z-index: 50;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+        .select-multiple-dropdown.open {
+            display: block;
+        }
+        .select-multiple-option {
+            padding: 0.5rem 1rem;
+            cursor: pointer;
+        }
+        .select-multiple-option:hover {
+            background-color: #4a5568;
+        }
+        .selected-option {
+            background-color: #10b981;
+            color: white;
+        }
+        .play-type-category {
+            font-weight: bold;
+            color: #a0aec0;
+            padding: 0.75rem 1rem 0.25rem;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+        }
+        /* Speed controls styling */
+        .speed-controls {
+            display: flex;
+            justify-content: center;
+            gap: 0.5rem;
+            margin-bottom: 1.5rem;
+            background-color: #2d3748;
+            padding: 0.5rem;
+            border-radius: 9999px;
+        }
+        .speed-controls label {
+            padding: 0.5rem 1rem;
+            border-radius: 9999px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+            font-size: 0.875rem;
+        }
+        .speed-controls input[type="radio"] {
+            display: none;
+        }
+        .speed-controls input[type="radio"]:checked + label {
+            background-color: #4a5568;
+            color: white;
+        }
+        #quarterScoresTable {
+            width: auto;
+            margin: 1rem auto;
+            border: 1px solid #4a5568;
+        }
+        #quarterScoresTable th, #quarterScoresTable td {
+            text-align: center;
+            padding: 0.5rem 1rem;
+        }
+        #quarterScoresTable th {
+            background-color: #2d3748;
+        }
+        #quarterScoresTable td:first-child {
+            text-align: left;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body class="p-6">
+    <div class="container mx-auto">
+        <div class="header">
+            <h1 class="text-3xl font-bold">Ultimate Basketball Manager Simulator</h1>
+        </div>
+
+        <div id="loading" class="text-center text-gray-400 mb-4">
+            <div class="loading-spinner mx-auto mb-2"></div>
+            <span>Φορτώνω τα δεδομένα...</span>
+        </div>
+
+        <div id="app" class="hidden">
+            <!-- Tab Buttons -->
+            <div class="tab-container">
+                <button id="tab-roster-btn" class="btn-tab active">
+                    Ρόστερ
+                </button>
+                <button id="tab-boxscore-btn" class="btn-tab">
+                    Boxscore
+                </button>
+                <button id="tab-playbyplay-btn" class="btn-tab">
+                    Play-by-Play
+                </button>
+                <button id="tab-params-btn" class="btn-tab">
+                    Parameters
+                </button>
+            </div>
+
+            <div class="card">
+                <!-- Roster Tab Content -->
+                <div id="tab-roster" class="tab-content">
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                        <div>
+                            <div class="flex justify-center items-center gap-4 mb-4">
+                                <h2 class="text-2xl font-bold text-center flex-1">
+                                    <input type="text" id="teamAname" class="input-text w-full text-center" value="Team A Name">
+                                </h2>
+                                <div class="flex flex-col items-center">
+                                    <span class="text-xs text-gray-400">AVG OVR</span>
+                                    <span id="teamA_AvgOverall_roster" class="text-xl font-bold bg-gray-600 px-3 py-1 rounded-lg">0.0</span>
+                                </div>
+                            </div>
+                            <div id="rosterTableAContainer">
+                                <!-- Player details will be generated here -->
+                            </div>
+                        </div>
+                        <div>
+                            <div class="flex justify-center items-center gap-4 mb-4">
+                                <h2 class="text-2xl font-bold text-center flex-1">
+                                    <input type="text" id="teamBname" class="input-text w-full text-center" value="Team B Name">
+                                </h2>
+                                <div class="flex flex-col items-center">
+                                    <span class="text-xs text-gray-400">AVG OVR</span>
+                                    <span id="teamB_AvgOverall_roster" class="text-xl font-bold bg-gray-600 px-3 py-1 rounded-lg">0.0</span>
+                                </div>
+                            </div>
+                            <div id="rosterTableBContainer">
+                                <!-- Player details will be generated here -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Boxscore Tab Content -->
+                <div id="tab-boxscore" class="tab-content hidden">
+                    <div class="table-container space-y-8">
+                        <table id="boxscoreTableA">
+                            <thead>
+                                <tr>
+                                    <th id="boxscoreTeamAHeader" colspan="16">Team A</th>
+                                </tr>
+                                <tr>
+                                    <th>Όνομα</th><th>2P-M</th><th>2P-A</th><th>3P-M</th><th>3P-A</th><th>FT-M</th><th>FT-A</th><th>AS</th><th>REB</th><th>ST</th><th>BL</th><th>FF</th><th>FC</th><th>TOs</th><th>PIR</th><th>PTS</th>
+                                </tr>
+                            </thead>
+                            <tbody></tbody>
+                            <tfoot></tfoot>
+                        </table>
+                        <table id="boxscoreTableB">
+                            <thead>
+                                <tr>
+                                    <th id="boxscoreTeamBHeader" colspan="16">Team B</th>
+                                </tr>
+                                <tr>
+                                    <th>Όνομα</th><th>2P-M</th><th>2P-A</th><th>3P-M</th><th>3P-A</th><th>FT-M</th><th>FT-A</th><th>AS</th><th>REB</th><th>ST</th><th>BL</th><th>FF</th><th>FC</th><th>TOs</th><th>PIR</th><th>PTS</th>
+                                </tr>
+                            </thead>
+                            <tbody></tbody>
+                            <tfoot></tfoot>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Play-by-Play Tab Content -->
+                <div id="tab-playbyplay" class="tab-content hidden">
+                    <div class="flex flex-col h-full">
+                        <div class="text-center">
+                            <h2 class="text-2xl font-bold mb-4">
+                                Play-by-Play
+                            </h2>
+                            <button id="simulateBtn" class="btn-primary px-6 py-3 rounded-full font-bold text-lg shadow-lg mb-4">
+                                <i class="fa-solid fa-basketball-ball mr-2"></i> Προσομοίωση Αγώna
+                            </button>
+
+                            <div id="speedControls" class="speed-controls">
+                                <input type="radio" id="speed-slow" name="simSpeed" value="5000">
+                                <label for="speed-slow">Αργή</label>
+                                
+                                <input type="radio" id="speed-normal" name="simSpeed" value="3500" checked>
+                                <label for="speed-normal">Κανονική</label>
+                                
+                                <input type="radio" id="speed-fast" name="simSpeed" value="2000">
+                                <label for="speed-fast">Γρήγορη</label>
+                                
+                                <input type="radio" id="speed-instant" name="simSpeed" value="0">
+                                <label for="speed-instant">Άμεση</label>
+                            </div>
+
+                            <div class="score-board mb-4">
+                                <div class="team-info text-right">
+                                    <span id="teamAnameDisplay" class="team-name block">Ομάδα Α</span>
+                                    <span id="teamA_AvgOverall_pbp" class="text-sm font-normal text-gray-400">OVR: 0.0</span>
+                                </div>
+                                <span id="scoreA" class="score">0</span>
+                                <span class="text-gray-400">-</span>
+                                <span id="scoreB" class="score">0</span>
+                                <div class="team-info text-left">
+                                    <span id="teamBnameDisplay" class="team-name block">Ομάδα Β</span>
+                                    <span id="teamB_AvgOverall_pbp" class="text-sm font-normal text-gray-400">OVR: 0.0</span>
+                                </div>
+                            </div>
+                            
+                            <div class="table-container my-4">
+                                <table id="quarterScoresTable">
+                                    <thead></thead>
+                                    <tbody></tbody>
+                                </table>
+                            </div>
+
+                        </div>
+                        <div class="flex-1 overflow-y-auto max-h-[600px] border border-[#4a5568] rounded-xl p-4">
+                            <div id="playByPlayLog">
+                                <p class="text-gray-500 text-center py-4">Πατήστε "Προσομοίωση Αγώνα" για να ξεκινήσει το παιχνίδι.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Parameters Tab Content -->
+                <div id="tab-params" class="tab-content hidden">
+                    <h2 class="text-2xl font-bold mb-4">Παράμετροι Αγώna</h2>
+                    <div class="table-container">
+                        <table id="paramsTable">
+                            <thead>
+                                <tr>
+                                    <th>Παράμετρος</th>
+                                    <th>Τιμή</th>
+                                    <th>Περιγραφή</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <!-- Parameters will be inserted here by JavaScript -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const rosterData = [
+            // TEAM A - Specialized Players
+            { POS: 'PG', NAME: 'Slasher PG', HEIGHT: 190, WEIGHT: 90, OVERALL: 0, '3P': 6, FT: 7, REB: 4, PAS: 8, DRI: 9, DEF: 6, STL: 6, BLK: 2, AGGR: 8, IQ: 8, Hustle: 7, MentalToughness: 7, Motor: 8, POST: 3, MID: 5, DRIVE: 9, FIN: 8, SPD: 9, STR: 7, VER: 7, Team: 'A', PlayTypes: [] },
+            { POS: 'SG', NAME: 'Pure Shooter', HEIGHT: 195, WEIGHT: 92, OVERALL: 0, '3P': 9, FT: 9, REB: 3, PAS: 5, DRI: 6, DEF: 5, STL: 4, BLK: 2, AGGR: 4, IQ: 7, Hustle: 6, MentalToughness: 6, Motor: 7, POST: 2, MID: 8, DRIVE: 5, FIN: 5, SPD: 7, STR: 5, VER: 6, Team: 'A', PlayTypes: [] },
+            { POS: 'SF', NAME: '3&D Wing', HEIGHT: 201, WEIGHT: 100, OVERALL: 0, '3P': 8, FT: 8, REB: 5, PAS: 4, DRI: 5, DEF: 8, STL: 7, BLK: 4, AGGR: 5, IQ: 6, Hustle: 8, MentalToughness: 7, Motor: 8, POST: 4, MID: 6, DRIVE: 6, FIN: 6, SPD: 8, STR: 7, VER: 7, Team: 'A', PlayTypes: [] },
+            { POS: 'PF', NAME: 'Post Bruiser', HEIGHT: 206, WEIGHT: 112, OVERALL: 0, '3P': 4, FT: 6, REB: 9, PAS: 5, DRI: 4, DEF: 6, STL: 4, BLK: 6, AGGR: 9, IQ: 6, Hustle: 8, MentalToughness: 8, Motor: 7, POST: 9, MID: 5, DRIVE: 5, FIN: 8, SPD: 5, STR: 9, VER: 6, Team: 'A', PlayTypes: [] },
+            { POS: 'C', NAME: 'Def. Anchor', HEIGHT: 211, WEIGHT: 118, OVERALL: 0, '3P': 2, FT: 5, REB: 9, PAS: 4, DRI: 3, DEF: 9, STL: 3, BLK: 9, AGGR: 7, IQ: 7, Hustle: 7, MentalToughness: 8, Motor: 6, POST: 7, MID: 3, DRIVE: 4, FIN: 7, SPD: 4, STR: 9, VER: 8, Team: 'A', PlayTypes: [] },
+            
+            // TEAM B - Default "Blank Slate" Players
+            { POS: 'PG', NAME: 'PlayerB1', HEIGHT: 190, WEIGHT: 90, OVERALL: 5, '3P': 5, FT: 5, REB: 5, PAS: 5, DRI: 5, DEF: 5, STL: 5, BLK: 5, AGGR: 5, IQ: 5, Hustle: 5, MentalToughness: 5, Motor: 5, POST: 5, MID: 5, DRIVE: 5, FIN: 5, SPD: 5, STR: 5, VER: 5, Team: 'B', PlayTypes: [] },
+            { POS: 'SG', NAME: 'PlayerB2', HEIGHT: 190, WEIGHT: 90, OVERALL: 5, '3P': 5, FT: 5, REB: 5, PAS: 5, DRI: 5, DEF: 5, STL: 5, BLK: 5, AGGR: 5, IQ: 5, Hustle: 5, MentalToughness: 5, Motor: 5, POST: 5, MID: 5, DRIVE: 5, FIN: 5, SPD: 5, STR: 5, VER: 5, Team: 'B', PlayTypes: [] },
+            { POS: 'SF', NAME: 'PlayerB3', HEIGHT: 190, WEIGHT: 90, OVERALL: 5, '3P': 5, FT: 5, REB: 5, PAS: 5, DRI: 5, DEF: 5, STL: 5, BLK: 5, AGGR: 5, IQ: 5, Hustle: 5, MentalToughness: 5, Motor: 5, POST: 5, MID: 5, DRIVE: 5, FIN: 5, SPD: 5, STR: 5, VER: 5, Team: 'B', PlayTypes: [] },
+            { POS: 'PF', NAME: 'PlayerB4', HEIGHT: 190, WEIGHT: 90, OVERALL: 5, '3P': 5, FT: 5, REB: 5, PAS: 5, DRI: 5, DEF: 5, STL: 5, BLK: 5, AGGR: 5, IQ: 5, Hustle: 5, MentalToughness: 5, Motor: 5, POST: 5, MID: 5, DRIVE: 5, FIN: 5, SPD: 5, STR: 5, VER: 5, Team: 'B', PlayTypes: [] },
+            { POS: 'C', NAME: 'PlayerB5', HEIGHT: 208, WEIGHT: 115, OVERALL: 5, '3P': 5, FT: 5, REB: 5, PAS: 5, DRI: 5, DEF: 5, STL: 5, BLK: 5, AGGR: 5, IQ: 5, Hustle: 5, MentalToughness: 5, Motor: 5, POST: 5, MID: 5, DRIVE: 5, FIN: 5, SPD: 5, STR: 7, VER: 7, Team: 'B', PlayTypes: [] }
+        ];
+
+        const playTypes = [
+             { category: 'On-Ball Scoring', types: ['Isolation', 'PnR Handler', 'Slasher'] },
+             { category: 'Off-Ball Scoring', types: ['Spot Up Shooter', 'Transition', 'Cutter', 'Off-Screen Shooter'] },
+             { category: 'Playmaking', types: ['Playmaker', 'Post Playmaker', 'Floor General'] },
+             { category: 'Post & Big Man Play', types: ['Low Post Scorer', 'PnR Roller', 'Stretch Big'] },
+             { category: 'Rebounding', types: ['Rebounder'] },
+             { category: 'Defensive Roles', types: ['Defensive Stopper', 'Perimeter Pest', 'Rim Protector'] },
+             { category: 'Intangibles / Mental', types: ['Clutch Scorer', 'Heat Check Scorer', 'Glue Guy'] }
+        ];
+
+        const defaultPlayTypesByPosition = {
+            'PG': ['PnR Handler', 'Playmaker', 'Slasher', 'Spot Up Shooter', 'Transition'],
+            'SG': ['Spot Up Shooter', 'Off-Screen Shooter', 'Transition', 'Isolation', 'PnR Handler'],
+            'SF': ['Spot Up Shooter', 'Cutter', 'Transition', 'Isolation', 'Defensive Stopper'],
+            'PF': ['PnR Roller', 'Rebounder', 'Low Post Scorer', 'Cutter', 'Stretch Big'],
+            'C': ['PnR Roller', 'Rebounder', 'Rim Protector', 'Low Post Scorer', 'Cutter']
+        };
+
+        const paramsData = {
+            '1. PossessionLength_Fastbreak%': { Value: 0.10, Desc: 'Πιθανότητα για αιφνιδιασμό (3-6 δευτ.).'},
+            '2. PossessionLength_Secondary%': { Value: 0.20, Desc: 'Πιθανότητα για δευτ. αιφνιδιασμό (6-10 δευτ.).'},
+            '3. PossessionLength_Intermediate%': { Value: 0.40, Desc: 'Πιθανότητα για ενδιάμεσο παιχνίδι (10-16 δευτ.).'},
+            '4. PossessionLength_SetPlay%': { Value: 0.30, Desc: 'Πιθανότητα για set παιχνίδι (17-24 δευτ.).'},
+            '5. Base3P%': { Value: 0.35, Desc: 'Βασικό ποσοστό ευστοχίας για τρίποντα.' },
+            '6. BaseMidRange%': { Value: 0.40, Desc: 'Βασικό ποσοστό ευστοχίας για σουτ μέσης απόστασης.'},
+            '7. BasePostUp%': { Value: 0.46, Desc: 'Βασικό ποσοστό ευστοχίας για Post-Up.'},
+            '8. BaseDrive%': { Value: 0.52, Desc: 'Βασικό ποσοστό ευστοχίας για διεισδύσεις.'},
+            '9. ShotContest_WideOpen_Bonus': { Value: 0.10, Desc: 'Bonus ευστοχίας σε εντελώς ελεύθερο σουτ.'},
+            '10. ShotContest_Open_Bonus': { Value: 0.05, Desc: 'Bonus ευστοχίας σε σχετικά ελεύθερο σουτ.'},
+            '11. ShotContest_Contested_Bonus': { Value: 0.0, Desc: 'Bonus/Penalty σε σουτ με κανονική άμυνα.'},
+            '12. ShotContest_Heavily_Penalty': { Value: -0.07, Desc: 'Penalty ευστοχίας σε σουτ υπό ασφυκτική πίεση.'},
+            '13. ShotDistribution_3P': { Value: 0.45, Desc: 'Ποσοστό των σουτ που είναι τρίποντα.'},
+            '14. ShotDistribution_Mid': { Value: 0.20, Desc: 'Ποσοστό των σουτ που είναι από μέση απόσταση.'},
+            '15. ShotDistribution_Post': { Value: 0.15, Desc: 'Ποσοστό των επιθέσεων που είναι Post-Up.'},
+            '16. ShotDistribution_Drive': { Value: 0.20, Desc: 'Ποσοστό των επιθέσεων που είναι διείσδυση.'},
+            '17. FT%': { Value: 0.78, Desc: 'Βασικό ποσοστό ευστοχίας για βολές.' },
+            '18. AssistRate': { Value: 0.60, Desc: 'Πιθανότητα ένα καλάθι να προέλθει από ασίστ.'},
+            '19. TurnoverBase': { Value: 0.09, Desc: 'Βασικό ποσοστό λάθους.' },
+            '20. TurnoverType_Steal%': { Value: 0.60, Desc: 'Ποσοστό των λαθών που είναι κλεψίματα.'},
+            '21. OtherTurnover_BadPass%': { Value: 0.50, Desc: 'Από τα "αβίαστα", το % που είναι κακές πάσες.'},
+            '22. OtherTurnover_BadDribble%': { Value: 0.35, Desc: 'Από τα "αβίαστα", το % που είναι κακές ντρίμπλες.'},
+            '23. FiveSecondViolationBase%': { Value: 0.01, Desc: 'Πιθανότητα παράβασης 5" στην επαναφορά.'},
+            '24. EightSecondViolationBase%': { Value: 0.01, Desc: 'Πιθανότητα παράβασης 8" στο κέντρο.'},
+            '25. OffensiveFoulBase': { Value: 0.025, Desc: 'Βασικό ποσοστό επιθετικού φάουλ (επηρεάζεται από HUSTLE).'},
+            '26. BlockBase': { Value: 0.35, Desc: 'Βασικό ποσοστό κοψίματος.' },
+            '27. BlockAttempt_FoulModifier': { Value: 2.0, Desc: 'Πόσο αυξάνεται το ρίσκο φάουλ σε προσπάθεια για τάπα.'},
+            '28. BlockOn3P_PenaltyModifier': { Value: 0.1, Desc: 'Πόσο πιο σπάνιες είναι οι τάπες σε τρίποντα.'},
+            '29. Athleticism_Speed_Modifier': { Value: 1.5, Desc: 'Bonus στο "Getting Open" από πλεονέκτημα ταχύτητας.'},
+            '30. Athleticism_Strength_Modifier': { Value: 1.5, Desc: 'Bonus στο "Getting Open" από πλεονέκτημα δύναμης.'},
+            '31. Athleticism_Vertical_Modifier': { Value: 1.5, Desc: 'Bonus στο "Contest" από πλεονέκτημα αλτικότητας.'},
+            '32. Athleticism_AndOne_Modifier': { Value: 1.5, Desc: 'Πολλαπλασιαστής για "καλάθι-και-φάουλ" λόγω δύναμης.'},
+            '33. AlleyOop_Attempt_Base%': { Value: 0.20, Desc: 'Βασική πιθανότητα (20%) για προσπάθεια Alley-Oop.'},
+            '34. Hustle_Rebound_Modifier': { Value: 0.15, Desc: 'Πιθανότητα (+15%) ένα "Hustle Play" να "κλέψει" ένα ριμπάουντ.'},
+            '35. Motor_OffScreen_Modifier': { Value: 1.5, Desc: 'Η ένταση της "Μάχης των Σκριν".'},
+            '36. Cutter_Attempt_Base%': { Value: 0.10, Desc: 'Βασική πιθανότητα (10%) για "αυθόρμητο" κόψιμο.'},
+            '37. GlueGuy_LooseBall_Bonus': { Value: 2.5, Desc: 'Bonus του Glue Guy στις διεκδικούμενες μπάλες.'},
+            '38. GlueGuy_Charge_Modifier': { Value: 1.5, Desc: 'Πολλαπλασιαστής του Glue Guy στο κερδισμένο επιθετικό φάουλ.'},
+            '39. FoulBaseOnShot': { Value: 0.12, Desc: 'Βασικό ποσοστό φάουλ σε προσπάθεια για σουτ.' },
+            '40. NonShootingFoulBase': { Value: 0.11, Desc: 'Βασικό ποσοστό φάουλ εκτός σουτ.' },
+            '41. FoulModifier_Drive': { Value: 1.5, Desc: 'Πολλαπλασιαστής φάουλ σε διείσδυση.'},
+            '42. FoulModifier_Post': { Value: 1.3, Desc: 'Πολλαπλασιαστής φάουλ σε post-up.'},
+            '43. FoulFactor_3P_Modifier': { Value: 0.70, Desc: 'Πολλαπλασιαστής πιθανότητας φάουλ σε σουτ 3Π.'},
+            '44. AndOneFoulChanceModifier' : { Value: 0.40, Desc: 'Πολλαπλασιαστής πιθανότητας για καλάθι-και-φάουλ.'},
+            '45. UnsportsmanlikeFoulBase%': { Value: 0.005, Desc: 'Βασική πιθανότητα για αντιαθλητικό φάουλ.'},
+            '46. TechnicalFoulBase%': { Value: 0.003, Desc: 'Βασική πιθανότητα για τεχνική ποινή.'},
+            '47. LooseBallChance': { Value: 0.03, Desc: 'Πιθανότητα για διεκδικούμενη μπάλα μετά από τάπα/κλέψιμο.'},
+            '48. OREB_Base': { Value: 0.25, Desc: 'Βασικό ποσοστό επιθετικού ριμπάουντ.' },
+            '49. SkillFactor_Shooting': { Value: 0.05, Desc: 'Πολλαπλασιαστής για την επίδραση των skills στο σουτ.' },
+            '50. SkillFactor_Foul': { Value: 0.015, Desc: 'Πολλαπλασιαστής για την επίδραση των skills στο φάουλ.' },
+            '51. SkillFactor_Turnover': { Value: 0.035, Desc: 'Πολλαπλασιαστής για την επίδραση των skills στο λάθος.' },
+            '52. SkillFactor_Rebound': { Value: 0.045, Desc: 'Πολλαπλασιαστής για την επίδραση των skills στο ριμπάουντ.' },
+            '53. SkillFactor_Block': { Value: 0.055, Desc: 'Πολλαπλασιαστής για την επίδραση των skills στο κόψιμο.' },
+            '54. FocusStar_BaseChance' : { Value: 0.22, Desc: 'Βασική πιθανότητα για focus στον σταρ.' },
+            '55. FocusStar_OverallBonus' : { Value: 0.06, Desc: 'Bonus αν ο σταρ έχει το υψηλότερο Overall.' },
+            '56. FocusStar_HotHandBonus' : { Value: 0.08, Desc: 'Bonus αν ο σταρ είναι "καυτός".' },
+            '57. FocusStar_ClutchTimeBonus' : { Value: 0.06, Desc: 'Bonus σε clutch time.' },
+            '58. FocusStar_ClutchScorerBonus' : { Value: 0.04, Desc: 'Bonus αν ο σταρ είναι "Clutch Scorer".' },
+            '59. FocusStar_BlowoutPenalty' : { Value: -0.05, Desc: 'Penalty αν η ομάδα προηγείται με μεγάλη διαφορά.' },
+            '60. FocusStar_Duration' : { Value: 3, Desc: 'Διάρκεια (σε κατοχές) του focus στον σταρ.' },
+            '61. DefensivePlan_NoAdjustment_Chance' : { Value: 0.50, Desc: 'Πιθανότητα να μην υπάρχει ειδικό πλάνο.' },
+            '62. DefensivePlan_PackThePaint_Chance' : { Value: 0.15, Desc: 'Πιθανότητα για "Pack the Paint".' },
+            '63. DefensivePlan_SwitchEverything_Chance' : { Value: 0.12, Desc: 'Πιθανότητα για "Switch Everything".' },
+            '64. DefensivePlan_DenyOffScreen_Chance' : { Value: 0.10, Desc: 'Πιθανότητα για "Deny Off-Screen".' },
+            '65. DefensivePlan_DropVsPnR_Chance' : { Value: 0.08, Desc: 'Πιθανότητα για "Drop" στο PnR.' },
+            '66. DefensivePlan_HedgeVsPnR_Chance' : { Value: 0.05, Desc: 'Πιθανότητα για "Hedge" στο PnR.' },
+            '67. PackThePaint_Penalty2P' : { Value: -0.03, Desc: 'Penalty σε 2P στο ζωγραφιστό.' },
+            '68. PackThePaint_Bonus3P' : { Value: 0.02, Desc: 'Bonus σε ελεύθερα spot-up 3P.' },
+            '69. Switch_PenaltyISO' : { Value: -0.02, Desc: 'Penalty σε ISO guards.' },
+            '70. Switch_BonusPostUp' : { Value: 0.02, Desc: 'Bonus σε Post-up λόγω mismatch.' },
+            '71. Deny_AttemptsPenalty' : { Value: -0.04, Desc: 'Penalty στις προσπάθειες των σουτέρ.' },
+            '72. Deny_CutsBonus' : { Value: 0.02, Desc: 'Bonus στις προσπάθειες από κοψίματα.' },
+            '73. Drop_PenaltyRoll' : { Value: -0.025, Desc: 'Penalty στα τελειώματα του roller.' },
+            '74. Drop_BonusMid' : { Value: 0.02, Desc: 'Bonus στα pull-up σουτ μέσης απόστασης.' },
+            '75. Hedge_TurnoverBonus' : { Value: 0.015, Desc: 'Bonus στην πιθανότητα για λάθος του χειριστή.' },
+            '76. LuckFactor': { Value: 0.125, Desc: 'Παράγοντας τύχης (+/-) που επηρεάζει όλες τις ενέργειες.'},
+            '77. ShootingLuckFactor': { Value: 0.30, Desc: 'Παράγοντας τύχης (+/-) που επηρεάζει ΜΟΝΟ τα σουτ.'}
+        };
+
+        const overallSkillWeights = {
+            '3P': 0.1, 'FT': 0.04, 'REB': 0.08, 'PAS': 0.08, 'DRI': 0.05, 'DEF': 0.1, 'STL': 0.04, 'BLK': 0.04,
+            'POST': 0.07, 'MID': 0.07, 'DRIVE': 0.07, 'FIN': 0.07,
+            'SPD': 0.04, 'STR': 0.04, 'VER': 0.03,
+            'IQ': 0.08, 'Hustle': 0.02, 'MentalToughness': 0.02, 'Motor': 0.02, 'AGGR': 0.02
+        };
+        
+        const playByPlayTemplates = {
+            jumpballWin: ["{winner} κερδίζει το τζάμπολ!", "{winner} πηδάει ψηλότερα και παίρνει την πρώτη κατοχή.", "Η μπάλα στον αέρα... και ο {winner} την κερδίζει!"],
+            looseBall: ["Διεκδικούμενη μπάλα! Ο {winner} βουτάει στο παρκέ και την κερδίζει!", "Η μπάλα μένει ελεύθερη και ο {winner} την εξασφαλίζει με αυταπάρνηση!"],
+            fiveSecondViolation: ["Παράβαση 5 δευτερολέπτων στην επαναφορά από τον {player}!", "Ο {player} δεν κατάφερε να επαναφέρει τη μπάλα εγκαίρως."],
+            eightSecondViolation: ["Παράβαση 8 δευτερολέπτων! Ο {player} δεν πέρασε το κέντρο.", "Η ομάδα {team} χάνει την κατοχή λόγω παράβασης 8 δευτερολέπτων."],
+            badPassTurnover: ["Κακή πάσα από τον {player}, η μπάλα βγαίνει άουτ.", "Λάθος συνεννόηση, η πάσα του {player} καταλήγει στις εξέδρες."],
+            badDribbleTurnover: ["Ο {player} χάνει τον έλεγχο της μπάλας και πατάει τη γραμμή.", "Λάθος ντρίμπλα από τον {player}, η κατοχή αλλάζει."],
+            travelingViolation: ["Βήματα από τον {player}!", "Ο διαιτητής σφυρίζει βήματα στον {player}."],
+            madePostUp: [ "{shooter} παίζει με πλάτη και σκοράρει!", "Επιτυχημένο post move από τον {shooter}."],
+            madeMidRange: [ "{shooter} ευστοχεί από μέση απόσταση.", "Pull-up jumper και καλάθι από τον {shooter}!"],
+            madeDrive: ["{shooter} διεισδύει και τελειώνει τη φάση δυναμικά!", "Layup από τον {shooter} μετά από ωραία προσπάθεια."],
+            made3P: [
+                "Τρίποντο από τον {shooter}!",
+                "Βόμβα από τα 7.25! Ο {shooter} είναι εύστοχος!",
+                "Το βάζει από μακριά ο {shooter}!",
+                "Απίστευτο τρίποντο από τον {shooter}!",
+                "Για τρεις! Ο {shooter} δεν αστοχεί από την περιφέρεια."
+            ],
+            andOne: ["ΚΑΛΑΘΙ ΚΑΙ ΦΑΟΥΛ! Ο {shooter} κερδίζει και την βολή!", "Μετράει το καλάθι και κερδίζει και το φάουλ ο {shooter}!"],
+            missedShot: [
+                "Άστοχο το σουτ από τον {shooter}.",
+                "Ο {shooter} προσπαθεί, αλλά η μπάλα δεν του κάνει το χατίρι.",
+                "Δεν βρίσκει στόχο ο {shooter}.",
+                "Η προσπάθεια του {shooter} βρήκε σίδερο."
+            ],
+            rebound: [
+                "το ριμπάουντ πηγαίνει στον {rebounder}.",
+                "μάχη κάτω από τα καλάθια, ο {rebounder} εξασφαλίζει το ριμπάουντ.",
+                "ο {rebounder} καθαρίζει τη φάση."
+            ],
+            assist: [
+                " (με την εξαιρετική ασίστ του {passer}).",
+                " (μετά από όμορφη πάσα του {passer}).",
+                " (ο {passer} του έδωσε έτοιμο το καλάθι)."
+            ],
+            steal: [
+                "Λάθος από τον {turnoverPlayer} και ο {stealer} κλέβει την μπάλα!",
+                "Απίστευτη άμυνα από τον {stealer} που κλέβει την μπάλα!",
+                "Ο {turnoverPlayer} χάνει την κατοχή, ο {stealer} ήταν εκεί που έπρεπε."
+            ],
+            offensiveFoul: [
+                "Επιθετικό φάουλ από τον {fouler}!",
+                "Ο {fouler} χρεώνεται με επιθετικό φάουλ."
+            ],
+            foul: [
+                "Φάουλ του {fouler} στον {fouledPlayer} που πήγαινε για σουτ.",
+                "Ο {fouledPlayer} κερδίζει το φάουλ από τον {fouler}."
+            ],
+            nonShootingFoul: [
+                "Φάουλ του {fouler} στον {fouledPlayer} μακριά από τη φάση. Επαναφορά από το πλάι.",
+                "Ο {fouler} κάνει το φάουλ για να σταματήσει τη διείσδυση."
+            ],
+            unsportsmanlikeFoul: [
+                "Αντιαθλητικό φάουλ από τον {fouler}! Σκληρό μαρκάρισμα στον {fouledPlayer}."
+            ],
+            technicalFoul: [
+                "Τεχνική ποινή στον {player} για διαμαρτυρία!",
+                "Ο {player} χρεώνεται με τεχνική ποινή για έντονο trash talking."
+            ],
+            shotClockViolation: [
+                "Παράβαση 24 δευτερολέπτων! Η επίθεση δεν πρόλαβε να εκδηλωθεί.",
+                "Τέλος χρόνου επίθεσης, η κατοχή αλλάζει."
+            ],
+            fastbreak: [
+                "Γρήγορη αντεπίθεση και ο {scorer} τελειώνει τη φάση με λέι απ!",
+                "Τρέχουν το γήπεδο και ο {scorer} σκοράρει εύκολα στον αιφνιδιασμό!"
+            ],
+            block: [
+                "Τρομερό κόψιμο από τον {blocker} στον {shooter}!",
+                "Ο {shooter} πάει για το καλάθι, αλλά ο {blocker} του λέει 'όχι'!",
+                "Εντυπωσιακή τάπα του {blocker}!"
+            ]
+        };
+
+        function getPlayDescription(action, context) {
+            const templates = playByPlayTemplates[action];
+            if (!templates) return '';
+            let description = templates[Math.floor(Math.random() * templates.length)];
+            for (const key in context) {
+                description = description.replace(`{${key}}`, context[key]);
+            }
+            return description;
+        }
+
+
+        const app = document.getElementById('app');
+        const loading = document.getElementById('loading');
+        const teamAnameInput = document.getElementById('teamAname');
+        const teamBnameInput = document.getElementById('teamBname');
+        const simulateBtn = document.getElementById('simulateBtn');
+        const playByPlayLog = document.getElementById('playByPlayLog');
+        const paramsTableBody = document.getElementById('paramsTable').querySelector('tbody');
+        const scoreAEl = document.getElementById('scoreA');
+        const scoreBEl = document.getElementById('scoreB');
+        const teamAnameDisplay = document.getElementById('teamAnameDisplay');
+        const teamBnameDisplay = document.getElementById('teamBnameDisplay');
+
+        const tabButtons = document.querySelectorAll('.btn-tab');
+        const tabContents = document.querySelectorAll('.tab-content');
+
+        tabButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                tabButtons.forEach(btn => btn.classList.remove('active'));
+                tabContents.forEach(content => content.classList.add('hidden'));
+
+                button.classList.add('active');
+                const targetTab = document.getElementById(button.id.replace('-btn', ''));
+                targetTab.classList.remove('hidden');
+            });
+        });
+
+        function calculateOverall(skills) {
+            let overall = 0;
+            let totalWeight = 0;
+            for (const skill in overallSkillWeights) {
+                if (skills[skill]) {
+                    overall += skills[skill] * overallSkillWeights[skill];
+                    totalWeight += overallSkillWeights[skill];
+                }
+            }
+            return totalWeight > 0 ? (overall / totalWeight) : 0;
+        }
+
+        function getStaminaPenalty(stamina) {
+            if (stamina < 25) return 0.80; // 20% penalty
+            if (stamina < 50) return 0.90; // 10% penalty
+            return 1.0; // No penalty
+        }
+
+        // --- Simulation Engine ---
+        function getMismatchBonus(offense, defense, context) {
+            const heightDiff = offense.HEIGHT - defense.HEIGHT; // Positive if offense is taller
+            const weightDiff = offense.WEIGHT - defense.WEIGHT; // Positive if offense is heavier
+            let bonus = 0;
+
+            switch(context) {
+                case 'POST_OFFENSE':
+                    bonus += heightDiff * 0.01 + weightDiff * 0.005;
+                    break;
+                case 'DRIVE_OFFENSE':
+                     bonus += weightDiff * 0.005 - Math.abs(heightDiff) * 0.002;
+                    break;
+                case 'SHOT_CONTEST':
+                    bonus -= heightDiff * 0.01;
+                    break;
+                case 'REBOUND':
+                     bonus += heightDiff * 0.01 + weightDiff * 0.005;
+                     break;
+                case 'PERIMETER_DEFENSE':
+                    bonus -= heightDiff * 0.005;
+                    break;
+            }
+            return Math.max(-0.15, Math.min(0.15, bonus)); // Clamp bonus
+        }
+
+        function getTeamAverage(roster, skill) {
+            if (!roster || roster.length === 0) return 5; // Default if no roster
+            const total = roster.reduce((sum, player) => sum + (player[skill] || 5), 0);
+            return total / roster.length;
+        }
+
+
+        function simulatePossession(offenseTeam, defenseTeam, params, shotClock, isClutchTime = false, possessionStartLocation = 'backcourt', defensiveScheme = {}) {
+            
+            const clonePlayer = (player) => JSON.parse(JSON.stringify(player));
+
+            let offensePlayer, defensePlayer;
+            let teamA_roster = rosterData.filter(p => p.Team === 'A');
+            let teamB_roster = rosterData.filter(p => p.Team === 'B');
+            const onCourtPlayers = [...teamA_roster, ...teamB_roster];
+
+
+            // --- Apply Team Auras ---
+            let floorGeneralBonus = 0;
+            let glueGuyBonus = 0;
+            const offenseTeamRoster = offenseTeam.roster;
+
+            onCourtPlayers.forEach(p => {
+                if (p.Team === offenseTeamRoster[0].Team) {
+                    if (p.PlayTypes.includes('Floor General')) floorGeneralBonus += 0.5;
+                    if (p.PlayTypes.includes('Glue Guy')) glueGuyBonus += 0.5;
+                }
+            });
+
+            // --- 1. Weighted Player Selection ---
+            const playerWeights = offenseTeam.roster.map(p => {
+                let weight = p.OVERALL * p.OVERALL; // Base weight on overall
+                
+                // --- Offensive Play Type Tendencies ---
+                if (p.PlayTypes.includes('Isolation') || p.PlayTypes.includes('Slasher') || p.PlayTypes.includes('Low Post Scorer')) weight *= 1.2;
+                if (p.PlayTypes.includes('Clutch Scorer') && isClutchTime) weight *= 2.0;
+                
+                // --- Defensive Scheme Impact ---
+                if (defensiveScheme.focusOnStar && defensiveScheme.starName === p.NAME) {
+                    weight *= 0.65; // -35% chance to get the ball
+                }
+
+                return weight;
+            });
+            const totalWeight = playerWeights.reduce((sum, weight) => sum + weight, 0);
+            let randomWeight = Math.random() * totalWeight;
+            
+            for(let i = 0; i < offenseTeam.roster.length; i++) {
+                 randomWeight -= playerWeights[i];
+                 if (randomWeight <= 0) {
+                      offensePlayer = offenseTeam.roster[i];
+                      break;
+                 }
+            }
+            if (!offensePlayer) offensePlayer = offenseTeam.roster[0];
+
+
+            defensePlayer = defenseTeam.roster[Math.floor(Math.random() * defenseTeam.roster.length)];
+            
+            let enhancedOffensePlayer = clonePlayer(offensePlayer);
+            let enhancedDefensePlayer = clonePlayer(defensePlayer);
+            
+            enhancedOffensePlayer.IQ += floorGeneralBonus;
+            enhancedOffensePlayer.Hustle += glueGuyBonus;
+
+            // --- Initial Checks based on Possession Start ---
+            if (possessionStartLocation === 'inbound') {
+                const teamDefense = getTeamAverage(defenseTeam.roster, 'DEF');
+                const inbounderSkill = enhancedOffensePlayer.IQ + enhancedOffensePlayer.PAS;
+                const fiveSecondChance = params['23. FiveSecondViolationBase%'].Value - (inbounderSkill - teamDefense * 1.5) * 0.005;
+                if (Math.random() < fiveSecondChance) {
+                    offenseTeam.boxscore[offensePlayer.NAME].TOs++;
+                    return { outcome: 'turnover', description: getPlayDescription('fiveSecondViolation', {player: offensePlayer.NAME}), possessionTime: 5, shooter: offensePlayer, fouler: defensePlayer };
+                }
+            }
+            if (possessionStartLocation === 'backcourt') {
+                const teamDefense = getTeamAverage(defenseTeam.roster, 'DEF');
+                const handlerSkill = enhancedOffensePlayer.IQ + enhancedOffensePlayer.DRI;
+                const eightSecondChance = params['24. EightSecondViolationBase%'].Value - (handlerSkill - teamDefense * 1.5) * 0.005;
+                 if (Math.random() < eightSecondChance) {
+                    offenseTeam.boxscore[offensePlayer.NAME].TOs++;
+                    return { outcome: 'turnover', description: getPlayDescription('eightSecondViolation', {player: offensePlayer.NAME, team: offenseTeam.name}), possessionTime: 8, shooter: offensePlayer, fouler: defensePlayer };
+                }
+            }
+
+
+            // --- Determine possession time ---
+            let possessionTime = 0;
+            let isTransition = false;
+            const possessionTypeRand = Math.random();
+            const fastbreakLimit = params['1. PossessionLength_Fastbreak%'].Value * (enhancedOffensePlayer.PlayTypes.includes('Transition') ? 1.2 : 1);
+            const secondaryLimit = fastbreakLimit + params['2. PossessionLength_Secondary%'].Value;
+            const intermediateLimit = secondaryLimit + params['3. PossessionLength_Intermediate%'].Value;
+
+            if (possessionTypeRand < fastbreakLimit) {
+                possessionTime = 3 + Math.random() * 3; // 3-6 seconds
+                isTransition = true;
+            } else if (possessionTypeRand < secondaryLimit) {
+                possessionTime = 6 + Math.random() * 4; // 6-10 seconds
+                 isTransition = true;
+            } else if (possessionTypeRand < intermediateLimit) {
+                possessionTime = 10 + Math.random() * 6; // 10-16 seconds
+            } else {
+                possessionTime = 17 + Math.random() * 7; // 17-24 seconds
+            }
+            
+            if (possessionTime >= shotClock) {
+                 return { outcome: 'shot_clock_violation', description: getPlayDescription('shotClockViolation'), possessionTime: shotClock, shooter: offensePlayer, fouler: defensePlayer };
+            }
+
+            // --- Apply Motor Bonuses to Cloned Players ---
+            const applyMotorBonus = (player) => {
+                let spd_bonus = (player.Motor - 5) * 0.05;
+                if (player.POS === 'PF' || player.POS === 'C') {
+                    spd_bonus *= 1.5;
+                }
+                if (isTransition) {
+                    spd_bonus += (player.Motor - 5) * 0.05;
+                }
+                player.SPD += spd_bonus;
+            }
+            applyMotorBonus(enhancedOffensePlayer);
+            applyMotorBonus(enhancedDefensePlayer);
+
+            
+            const luck = (Math.random() - 0.5) * params['76. LuckFactor'].Value * 2;
+            const shootingLuck = (Math.random() - 0.5) * params['77. ShootingLuckFactor'].Value * 2;
+            
+            const offStaminaPenalty = getStaminaPenalty(offenseTeam.boxscore[offensePlayer.NAME].stamina);
+            const defStaminaPenalty = getStaminaPenalty(defenseTeam.boxscore[defensePlayer.NAME].stamina);
+
+            let points = 0;
+            let description = '';
+            let outcome = '';
+            let ftAttempts = 0;
+            let shooter = offensePlayer;
+            let fouler = defensePlayer;
+
+            // --- TURNOVER DUEL ---
+            let turnoverChance = params['19. TurnoverBase'].Value - ((enhancedOffensePlayer.DRI + enhancedOffensePlayer.IQ + enhancedOffensePlayer.STR * offStaminaPenalty) - (enhancedDefensePlayer.STL + enhancedDefensePlayer.DEF + enhancedDefensePlayer.AGGR) * defStaminaPenalty) / 3 * params['51. SkillFactor_Turnover'].Value + luck;
+            if (defensiveScheme.focusOnStar && defensiveScheme.starName === enhancedOffensePlayer.NAME) {
+                turnoverChance += 0.02; // +2% turnover chance when focused
+            }
+            
+            if (Math.random() < turnoverChance) {
+                 // It's a turnover, now let's categorize it
+                 const isSteal = Math.random() < params['20. TurnoverType_Steal%'].Value;
+                 if (isSteal) {
+                    // --- STEAL LOGIC 2.0 ("The Predator") ---
+                    const predatorWeights = defenseTeam.roster.map(p => {
+                        let weight = (p.STL * 2) + p.DEF + p.SPD + p.Hustle;
+                        if (p.PlayTypes.includes('Perimeter Pest')) weight *= 1.6;
+                        if (p.PlayTypes.includes('Defensive Stopper')) weight *= 1.3;
+                        return weight;
+                    });
+                    const totalPredatorWeight = predatorWeights.reduce((a, b) => a + b, 0);
+                    let randomPredator = Math.random() * totalPredatorWeight;
+                    let stealer = defenseTeam.roster[0]; // Default stealer
+                    for(let i = 0; i < defenseTeam.roster.length; i++) {
+                        randomPredator -= predatorWeights[i];
+                        if (randomPredator <= 0) {
+                            stealer = defenseTeam.roster[i];
+                            break;
+                        }
+                    }
+                     description = getPlayDescription('steal', { turnoverPlayer: offensePlayer.NAME, stealer: stealer.NAME });
+                     offenseTeam.boxscore[offensePlayer.NAME].TOs++;
+                     defenseTeam.boxscore[stealer.NAME].ST++;
+                     outcome = 'steal';
+                 } else { // Other Turnover
+                    offenseTeam.boxscore[offensePlayer.NAME].TOs++;
+                    const badPassWeight = params['21. OtherTurnover_BadPass%'].Value * (1 - (enhancedOffensePlayer.PAS - 5) * 0.05);
+                    const badDribbleWeight = params['22. OtherTurnover_BadDribble%'].Value * (1 - (enhancedOffensePlayer.DRI - 5) * 0.05);
+                    const travelingWeight = 1 - (params['21. OtherTurnover_BadPass%'].Value + params['22. OtherTurnover_BadDribble%'].Value);
+                    
+                    const totalOtherWeight = badPassWeight + badDribbleWeight + travelingWeight;
+                    let randomOther = Math.random() * totalOtherWeight;
+
+                    if (randomOther < badPassWeight) {
+                        description = getPlayDescription('badPassTurnover', {player: offensePlayer.NAME});
+                    } else if (randomOther < badPassWeight + badDribbleWeight) {
+                        description = getPlayDescription('badDribbleTurnover', {player: offensePlayer.NAME});
+                    } else {
+                        description = getPlayDescription('travelingViolation', {player: offensePlayer.NAME});
+                    }
+                    outcome = 'turnover';
+                 }
+
+                // Loose Ball Check after steal
+                if(outcome === 'steal' && Math.random() < params['47. LooseBallChance'].Value) {
+                    const offPlayerHustle = (enhancedOffensePlayer.Hustle + enhancedOffensePlayer.SPD * offStaminaPenalty) * Math.random();
+                    const defPlayerHustle = (enhancedDefensePlayer.Hustle + enhancedDefensePlayer.SPD * defStaminaPenalty) * Math.random();
+                    const winner = offPlayerHustle > defPlayerHustle ? enhancedOffensePlayer : enhancedDefensePlayer;
+                    description += ` ${getPlayDescription('looseBall', {winner: winner.NAME})}`;
+                    return { outcome: winner.Team === offensePlayer.Team ? 'oreb' : 'dreb', description, possessionTime, shooter, fouler };
+                }
+                return { outcome, description, possessionTime, shooter, fouler };
+            }
+              
+             // --- Offensive Foul Check (influenced by HUSTLE) ---
+            const chargeDrawingChance = (enhancedDefensePlayer.IQ + enhancedDefensePlayer.Hustle - 10) * 0.01; // defender's chance
+            let offensiveFoulChance = params['25. OffensiveFoulBase'].Value + (enhancedOffensePlayer.AGGR - 5) * 0.005 - chargeDrawingChance + luck;
+            if (Math.random() < offensiveFoulChance) {
+                description = getPlayDescription('offensiveFoul', { fouler: offensePlayer.NAME });
+                offenseTeam.boxscore[offensePlayer.NAME].TOs++;
+                offenseTeam.boxscore[offensePlayer.NAME].FC++; 
+                defenseTeam.boxscore[defensePlayer.NAME].FF++;
+                return { outcome: 'turnover', description, possessionTime, shooter, fouler };
+            }
+            
+            // --- Shot Selection influenced by PlayTypes ---
+            const shotWeights = {
+                '3P': params['13. ShotDistribution_3P'].Value * (1 + (enhancedOffensePlayer['3P'] - 5) * 0.05),
+                'MID': params['14. ShotDistribution_Mid'].Value * (1 + (enhancedOffensePlayer['MID'] - 5) * 0.05),
+                'DRIVE': params['16. ShotDistribution_Drive'].Value * (1 + (enhancedOffensePlayer['DRIVE'] - 5) * 0.05),
+                'POST': params['15. ShotDistribution_Post'].Value * (1 + (enhancedOffensePlayer['POST'] - 5) * 0.05)
+            };
+            enhancedOffensePlayer.PlayTypes.forEach(pt => {
+                if (['Spot Up Shooter', 'Off-Screen Shooter', 'Stretch Big'].includes(pt)) shotWeights['3P'] *= 1.5;
+                if (['Slasher', 'PnR Handler', 'Isolation'].includes(pt)) shotWeights['DRIVE'] *= 1.2;
+                 if (['Isolation'].includes(pt)) shotWeights['MID'] *= 1.2;
+                if (['Low Post Scorer', 'Post Playmaker'].includes(pt)) shotWeights['POST'] *= 1.8;
+            });
+            // --- Modern Offense: Pull of the 3-Point Line ---
+            if (enhancedOffensePlayer['3P'] >= 6) {
+                shotWeights['3P'] *= 1.2;
+            }
+
+            const totalShotWeight = Object.values(shotWeights).reduce((a, b) => a + b, 0);
+            let randomShot = Math.random() * totalShotWeight;
+            let shotType = 'DRIVE';
+            for (const type in shotWeights) {
+                randomShot -= shotWeights[type];
+                if (randomShot <= 0) {
+                    shotType = type;
+                    break;
+                }
+            }
+            
+            // --- SMART FOUL LOGIC ---
+            const defensiveDiscipline = (enhancedDefensePlayer.DEF * 0.75 + enhancedDefensePlayer.IQ * 0.25) * defStaminaPenalty;
+            const foulTendency = enhancedDefensePlayer.AGGR - defensiveDiscipline;
+            const foulDrawingTendency = (enhancedOffensePlayer.AGGR - 5) + (enhancedOffensePlayer.STR - 5);
+
+
+            // --- Non-Shooting Foul Check ---
+            const nonShootingFoulChance = params['40. NonShootingFoulBase'].Value + (foulTendency + foulDrawingTendency) * (params['50. SkillFactor_Foul'].Value / 2) + luck;
+            if (Math.random() < nonShootingFoulChance) {
+                description = getPlayDescription('nonShootingFoul', { fouler: defensePlayer.NAME, fouledPlayer: offensePlayer.NAME });
+                offenseTeam.boxscore[offensePlayer.NAME].FF++;
+                defenseTeam.boxscore[defensePlayer.NAME].FC++;
+                return { outcome: 'non_shooting_foul', description, possessionTime, shooter, fouler };
+            }
+
+            // --- Base foul chance calculation for shooting fouls ---
+            let foulChance = params['39. FoulBaseOnShot'].Value + (foulTendency + foulDrawingTendency) * params['50. SkillFactor_Foul'].Value + luck;
+            // Apply modifiers
+            if (shotType === 'DRIVE') foulChance *= params['41. FoulModifier_Drive'].Value;
+            if (shotType === 'POST') foulChance *= params['42. FoulModifier_Post'].Value;
+             if (shotType === '3P') {
+                const recklessCloseoutChance = (enhancedDefensePlayer.AGGR - enhancedDefensePlayer.IQ) * 0.01;
+                foulChance += recklessCloseoutChance;
+                foulChance *= params['43. FoulFactor_3P_Modifier'].Value;
+            }
+
+
+            // --- Shot Contest Duel ---
+            let shotContestModifier = 0;
+            const gettingOpenRating = (enhancedOffensePlayer.SPD + enhancedOffensePlayer.Motor + enhancedOffensePlayer.IQ) / 3;
+            const contestRating = (enhancedDefensePlayer.DEF + enhancedDefensePlayer.SPD + enhancedDefensePlayer.Hustle) / 3;
+            const contestResult = gettingOpenRating - contestRating;
+
+            if (contestResult > 2.5) shotContestModifier = params['9. ShotContest_WideOpen_Bonus'].Value;
+            else if (contestResult > 1.0) shotContestModifier = params['10. ShotContest_Open_Bonus'].Value;
+            else if (contestResult <= -1.0) shotContestModifier = params['12. ShotContest_Heavily_Penalty'].Value;
+            else shotContestModifier = params['11. ShotContest_Contested_Bonus'].Value;
+
+
+            // --- Shot Execution (NEW BALANCED FORMULAS & STAMINA/MOTOR) ---
+            
+            let shotChance = 0;
+            let baseChance = 0;
+            let offensiveRating = 0;
+            let defensiveRating = 0;
+              
+            switch (shotType) {
+                case '3P': // 2v2 Duel
+                    baseChance = params['5. Base3P%'].Value;
+                    offensiveRating = (enhancedOffensePlayer['3P'] * 2 + enhancedOffensePlayer.IQ) / 3;
+                    defensiveRating = (enhancedDefensePlayer.DEF + enhancedDefensePlayer.SPD * defStaminaPenalty) / 2;
+                    defensiveRating += getMismatchBonus(enhancedOffensePlayer, enhancedDefensePlayer, 'SHOT_CONTEST');
+                    offenseTeam.boxscore[offensePlayer.NAME]['3POUT']++;
+                    break;
+                case 'MID': // 2v2 Duel
+                    baseChance = params['6. BaseMidRange%'].Value;
+                    offensiveRating = (enhancedOffensePlayer.MID + enhancedOffensePlayer.DRI) / 2;
+                    defensiveRating = (enhancedDefensePlayer.DEF + enhancedDefensePlayer.SPD * defStaminaPenalty) / 2;
+                    defensiveRating += getMismatchBonus(enhancedOffensePlayer, enhancedDefensePlayer, 'SHOT_CONTEST');
+                    offenseTeam.boxscore[offensePlayer.NAME]['2POUT']++;
+                    break;
+                case 'DRIVE': // 3v3 Duel
+                    baseChance = params['8. BaseDrive%'].Value;
+                    offensiveRating = (enhancedOffensePlayer.DRIVE + enhancedOffensePlayer.FIN + enhancedOffensePlayer.SPD * offStaminaPenalty) / 3;
+                    defensiveRating = (enhancedDefensePlayer.DEF + enhancedDefensePlayer.STR * defStaminaPenalty + enhancedDefensePlayer.SPD * defStaminaPenalty) / 3;
+                    offensiveRating += getMismatchBonus(enhancedOffensePlayer, enhancedDefensePlayer, 'DRIVE_OFFENSE');
+                    offenseTeam.boxscore[offensePlayer.NAME]['2POUT']++;
+                    break;
+                case 'POST': // 2v2 Duel
+                    baseChance = params['7. BasePostUp%'].Value;
+                    offensiveRating = (enhancedOffensePlayer.POST + enhancedOffensePlayer.STR * offStaminaPenalty) / 2;
+                    defensiveRating = (enhancedDefensePlayer.DEF + enhancedDefensePlayer.STR * defStaminaPenalty) / 2;
+                    offensiveRating += getMismatchBonus(enhancedOffensePlayer, enhancedDefensePlayer, 'POST_OFFENSE');
+                    offenseTeam.boxscore[offensePlayer.NAME]['2POUT']++;
+                    break;
+            }
+            
+            // --- Defensive Stopper 1-on-1 Bonus ---
+            if (enhancedDefensePlayer.PlayTypes.includes('Defensive Stopper')) {
+                defensiveRating += 0.5;
+            }
+
+            shotChance = baseChance + (offensiveRating - defensiveRating) * params['49. SkillFactor_Shooting'].Value + shootingLuck + shotContestModifier;
+            shotChance *= offStaminaPenalty; // Apply stamina penalty to final shot chance
+
+            if (Math.random() < shotChance) { // --- MADE SHOT ---
+                points = (shotType === '3P') ? 3 : 2;
+                if(shotType === '3P') {
+                    offenseTeam.boxscore[offensePlayer.NAME]['3PIN']++;
+                    description = getPlayDescription('made3P', {shooter: offensePlayer.NAME});
+                } else {
+                    offenseTeam.boxscore[offensePlayer.NAME]['2PIN']++;
+                    if(shotType === 'MID') description = getPlayDescription('madeMidRange', {shooter: offensePlayer.NAME});
+                    else if(shotType === 'DRIVE') description = getPlayDescription('madeDrive', {shooter: offensePlayer.NAME});
+                    else description = getPlayDescription('madePostUp', {shooter: offensePlayer.NAME});
+                }
+
+                // AND-ONE CHECK
+                const andOneCheck = foulChance * params['44. AndOneFoulChanceModifier'].Value;
+                if (Math.random() < andOneCheck) {
+                    offenseTeam.boxscore[offensePlayer.NAME].FF++;
+                    defenseTeam.boxscore[defensePlayer.NAME].FC++;
+                    description = getPlayDescription('andOne', { shooter: offensePlayer.NAME });
+                    return { outcome: 'and_one', points, description, ftAttempts: 1, shooter, fouler, possessionTime };
+                }
+                
+                const assistChance = params['18. AssistRate'].Value + (enhancedOffensePlayer.PAS - 5) * 0.02 + luck;
+                if (Math.random() < assistChance) {
+                    // --- ASSIST LOGIC 2.0 ("The Maestro") ---
+                    const potentialPassers = offenseTeam.roster.filter(p => p.NAME !== offensePlayer.NAME);
+                    if (potentialPassers.length > 0) {
+                        const passerWeights = potentialPassers.map(p => {
+                            let weight = p.PAS + p.IQ;
+                            if (p.PlayTypes.includes('Playmaker')) weight *= 1.5;
+                            if (p.PlayTypes.includes('Floor General')) weight *= 1.4;
+                            if (p.PlayTypes.includes('Post Playmaker')) weight *= 1.3;
+                            return weight;
+                        });
+                        const totalPasserWeight = passerWeights.reduce((a, b) => a + b, 0);
+                        let randomPasser = Math.random() * totalPasserWeight;
+                        let passer;
+                        for(let i = 0; i < potentialPassers.length; i++) {
+                            randomPasser -= passerWeights[i];
+                            if (randomPasser <= 0) {
+                                passer = potentialPassers[i];
+                                break;
+                            }
+                        }
+                        if(passer) {
+                            description += getPlayDescription('assist', { passer: passer.NAME });
+                            offenseTeam.boxscore[passer.NAME].AS++;
+                        }
+                    }
+                }
+                return { outcome: 'made_shot', points, description, possessionTime, shooter, fouler };
+
+            } else { // --- MISSED SHOT ---
+                // FOUL CHECK on MISS
+                if (Math.random() < foulChance) {
+                    const unsportsmanlikeTendency = (enhancedDefensePlayer.AGGR - enhancedDefensePlayer.IQ) + (enhancedDefensePlayer.STR * defStaminaPenalty - enhancedDefensePlayer.MentalToughness);
+                    const unsportsmanlikeChance = params['45. UnsportsmanlikeFoulBase%'].Value + (unsportsmanlikeTendency > 0 ? unsportsmanlikeTendency * 0.01 : 0);
+                    if(Math.random() < unsportsmanlikeChance){
+                        description = getPlayDescription('unsportsmanlikeFoul', { fouler: defensePlayer.NAME, fouledPlayer: offensePlayer.NAME });
+                        outcome = 'unsportsmanlike_foul';
+                    } else {
+                        description = getPlayDescription('foul', { fouler: defensePlayer.NAME, fouledPlayer: offensePlayer.NAME });
+                        outcome = 'shooting_foul';
+                    }
+                    offenseTeam.boxscore[offensePlayer.NAME].FF++;
+                    defenseTeam.boxscore[defensePlayer.NAME].FC++;
+                    ftAttempts = shotType === '3P' ? 3 : 2;
+                    return { outcome, description, ftAttempts, shooter, fouler, possessionTime };
+                }
+                
+                // --- BLOCK LOGIC 2.2 ("The Specialist") ---
+                const blockerInstinct = (enhancedDefensePlayer.BLK * 2.0) + enhancedDefensePlayer.VER;
+                const shooterAwareness = (enhancedOffensePlayer.FIN * 1.5) + (enhancedOffensePlayer.IQ * 0.5);
+                let blockAttemptChance = 0.15 + (blockerInstinct - shooterAwareness) * 0.025; 
+                if (enhancedDefensePlayer.BLK >= 8) blockAttemptChance += 0.10; // Specialist Bonus
+                if (enhancedDefensePlayer.PlayTypes.includes('Rim Protector')) blockAttemptChance += 0.15;
+                if (enhancedDefensePlayer.PlayTypes.includes('Defensive Stopper')) blockAttemptChance += 0.05;
+                if (shotContestModifier === params['12. ShotContest_Heavily_Penalty'].Value) blockAttemptChance += 0.10;
+                
+                if (Math.random() < Math.max(0.01, blockAttemptChance)) {
+                     const blockSuccessChance = params['26. BlockBase'].Value + ((enhancedDefensePlayer.BLK + enhancedDefensePlayer.VER) - (enhancedOffensePlayer.FIN + enhancedOffensePlayer.VER)) * params['53. SkillFactor_Block'].Value + luck;
+                     if (Math.random() < blockSuccessChance) {
+                         description = getPlayDescription('block', { blocker: defensePlayer.NAME, shooter: offensePlayer.NAME });
+                         defenseTeam.boxscore[defensePlayer.NAME].BL++;
+                         // Loose ball check after block
+                          if(Math.random() < params['47. LooseBallChance'].Value) {
+                              const offPlayerHustle = (enhancedOffensePlayer.Hustle + enhancedOffensePlayer.SPD * offStaminaPenalty) * Math.random();
+                              const defPlayerHustle = (enhancedDefensePlayer.Hustle + enhancedDefensePlayer.SPD * defStaminaPenalty) * Math.random();
+                              const winner = offPlayerHustle > defPlayerHustle ? enhancedOffensePlayer : enhancedDefensePlayer;
+                              description += ` ${getPlayDescription('looseBall', {winner: winner.NAME})}`;
+                              return { outcome: winner.Team === offensePlayer.Team ? 'oreb' : 'dreb', description, possessionTime, shooter, fouler };
+                          }
+                         return { outcome: 'dreb', description, possessionTime, shooter, fouler };
+                     }
+                }
+
+                // --- REBOUND LOGIC 2.0 ("The Scramble") ---
+                description += getPlayDescription('missedShot', { shooter: offensePlayer.NAME });
+                
+                let offenseReboundPower = 0;
+                offenseTeam.roster.forEach(p => {
+                    let power = (p.REB * 2) + p.STR + p.Hustle + (p.VER * 0.5);
+                    if(p.PlayTypes.includes('Rebounder')) power *= 1.5;
+                    offenseReboundPower += power;
+                });
+
+                let defenseReboundPower = 0;
+                defenseTeam.roster.forEach(p => {
+                    let power = (p.REB * 2) + p.STR + p.Hustle + (p.VER * 0.5);
+                    if(p.PlayTypes.includes('Rebounder')) power *= 1.5;
+                    defenseReboundPower += power;
+                });
+
+                const orebChance = params['48. OREB_Base'].Value + ((offenseReboundPower / 5) - (defenseReboundPower / 5)) * params['52. SkillFactor_Rebound'].Value + luck;
+
+                if (Math.random() < orebChance) { // Offensive Rebound
+                    const rebounderWeights = offenseTeam.roster.map(p => {
+                        let weight = (p.REB * 2) + p.STR + p.Hustle + (p.VER * 0.5);
+                        if(p.PlayTypes.includes('Rebounder')) weight *= 1.5;
+                        return weight;
+                    });
+                    const totalRebounderWeight = rebounderWeights.reduce((a,b) => a+b, 0);
+                    let randomRebounder = Math.random() * totalRebounderWeight;
+                    let rebounder = offenseTeam.roster[0];
+                    for(let i = 0; i < offenseTeam.roster.length; i++) {
+                        randomRebounder -= rebounderWeights[i];
+                        if (randomRebounder <= 0) {
+                            rebounder = offenseTeam.roster[i];
+                            break;
+                        }
+                    }
+                    description += ` Επιθετικό ${getPlayDescription('rebound', { rebounder: rebounder.NAME })}`;
+                    offenseTeam.boxscore[rebounder.NAME].REB++;
+                    return { outcome: 'oreb', description, possessionTime, shooter, fouler };
+                } else { // Defensive Rebound
+                     const rebounderWeights = defenseTeam.roster.map(p => {
+                        let weight = (p.REB * 2) + p.STR + p.Hustle + (p.VER * 0.5);
+                        if(p.PlayTypes.includes('Rebounder')) weight *= 1.5;
+                        return weight;
+                    });
+                    const totalRebounderWeight = rebounderWeights.reduce((a,b) => a+b, 0);
+                    let randomRebounder = Math.random() * totalRebounderWeight;
+                    let rebounder = defenseTeam.roster[0];
+                    for(let i = 0; i < defenseTeam.roster.length; i++) {
+                        randomRebounder -= rebounderWeights[i];
+                        if (randomRebounder <= 0) {
+                            rebounder = defenseTeam.roster[i];
+                            break;
+                        }
+                    }
+                    description += ` Αμυντικό ${getPlayDescription('rebound', { rebounder: rebounder.NAME })}`;
+                    defenseTeam.boxscore[rebounder.NAME].REB++;
+                    return { outcome: 'dreb', description, possessionTime, shooter, fouler };
+                }
+            }
+        }
+        
+        async function runSimulation() {
+            simulateBtn.disabled = true;
+            
+            document.getElementById('boxscoreTableA').querySelector('tbody').innerHTML = '';
+            document.getElementById('boxscoreTableA').querySelector('tfoot').innerHTML = '';
+            document.getElementById('boxscoreTableB').querySelector('tbody').innerHTML = '';
+            document.getElementById('boxscoreTableB').querySelector('tfoot').innerHTML = '';
+            
+            const teamAname = teamAnameInput.value;
+            const teamBname = teamBnameInput.value;
+            teamAnameDisplay.textContent = teamAname;
+            teamBnameDisplay.textContent = teamBname;
+
+            let scoreA = 0;
+            let scoreB = 0;
+            let quarterScores = { teamA: [], teamB: [] };
+            let lastScoreA = 0;
+            let lastScoreB = 0;
+            
+            const teamA_roster = rosterData.filter(p => p.Team === 'A');
+            const teamB_roster = rosterData.filter(p => p.Team === 'B');
+
+            // --- DYNAMIC PACE ENGINE ---
+            const calculatePaceScore = (roster) => {
+                let baseScore = 5; // Start from an average base
+                const avgSpd = getTeamAverage(roster, 'SPD');
+                const avgMotor = getTeamAverage(roster, 'Motor');
+
+                baseScore += (avgSpd - 5) * 0.5;
+                baseScore += (avgMotor - 5) * 0.3;
+
+                roster.forEach(player => {
+                    if (player.PlayTypes.includes('Transition')) baseScore += 0.4;
+                    if (player.PlayTypes.includes('Slasher')) baseScore += 0.2;
+                    if (player.PlayTypes.includes('PnR Handler')) baseScore += 0.1;
+                    if (player.PlayTypes.includes('Low Post Scorer')) baseScore -= 0.3;
+                    if (player.PlayTypes.includes('Post Playmaker')) baseScore -= 0.2;
+                });
+                return Math.max(1, Math.min(10, baseScore));
+            };
+
+            const paceScoreA = calculatePaceScore(teamA_roster);
+            const paceScoreB = calculatePaceScore(teamB_roster);
+            const gamePace = (paceScoreA + paceScoreB) / 2;
+
+            const currentGameParams = JSON.parse(JSON.stringify(paramsData));
+            
+            if (gamePace > 8) { // Run & Gun
+                currentGameParams['1. PossessionLength_Fastbreak%'].Value = 0.15;
+                currentGameParams['2. PossessionLength_Secondary%'].Value = 0.25;
+                currentGameParams['3. PossessionLength_Intermediate%'].Value = 0.35;
+                currentGameParams['4. PossessionLength_SetPlay%'].Value = 0.25;
+            } else if (gamePace > 6) { // Up-Tempo
+                currentGameParams['1. PossessionLength_Fastbreak%'].Value = 0.10;
+                currentGameParams['2. PossessionLength_Secondary%'].Value = 0.20;
+                currentGameParams['3. PossessionLength_Intermediate%'].Value = 0.40;
+                currentGameParams['4. PossessionLength_SetPlay%'].Value = 0.30;
+            } else if (gamePace < 4) { // Grindhouse
+                currentGameParams['1. PossessionLength_Fastbreak%'].Value = 0.02;
+                currentGameParams['2. PossessionLength_Secondary%'].Value = 0.08;
+                currentGameParams['3. PossessionLength_Intermediate%'].Value = 0.30;
+                currentGameParams['4. PossessionLength_SetPlay%'].Value = 0.60;
+            } else { // Deliberate (default-ish)
+                currentGameParams['1. PossessionLength_Fastbreak%'].Value = 0.05;
+                currentGameParams['2. PossessionLength_Secondary%'].Value = 0.15;
+                currentGameParams['3. PossessionLength_Intermediate%'].Value = 0.35;
+                currentGameParams['4. PossessionLength_SetPlay%'].Value = 0.45;
+            }
+            // --- END DYNAMIC PACE ENGINE ---
+
+
+            const boxscoreA = {};
+            const boxscoreB = {};
+            teamA_roster.forEach(p => {
+                boxscoreA[p.NAME] = { ...p, '2PIN': 0, '2POUT': 0, '3PIN': 0, '3POUT': 0, 'FTIN': 0, 'FTOUT': 0, 'AS': 0, 'REB': 0, 'ST': 0, 'BL': 0, 'FF': 0, 'FC': 0, 'TOs': 0, 'PIR': 0, 'PTS': 0, stamina: 100, isHot: false };
+            });
+            teamB_roster.forEach(p => {
+                boxscoreB[p.NAME] = { ...p, '2PIN': 0, '2POUT': 0, '3PIN': 0, '3POUT': 0, 'FTIN': 0, 'FTOUT': 0, 'AS': 0, 'REB': 0, 'ST': 0, 'BL': 0, 'FF': 0, 'FC': 0, 'TOs': 0, 'PIR': 0, 'PTS': 0, stamina: 100, isHot: false };
+            });
+
+            let quarter = 1;
+            let timeInQuarter = 10 * 60; // 10 minutes per quarter
+            let shotClock = 24;
+            let gameIsOver = false;
+            let possessionStartLocation = 'jumpball'; // Initial state
+            let heatCheckTracker = { player: null, count: 0 };
+            let focusState = { team: null, starName: null, duration: 0, cooldown: 0 };
+
+
+            const selectedSpeed = document.querySelector('input[name="simSpeed"]:checked').value;
+            const delay = parseInt(selectedSpeed, 10);
+            
+            renderQuarterScoresTable(quarterScores, teamAname, teamBname);
+
+            // --- JUMPBALL ---
+            const centerA = teamA_roster.find(p => p.POS === 'C') || teamA_roster[4];
+            const centerB = teamB_roster.find(p => p.POS === 'C') || teamB_roster[4];
+            const jumpballA = (centerA.HEIGHT + centerA.VER) * Math.random();
+            const jumpballB = (centerB.HEIGHT + centerB.VER) * Math.random();
+            let currentTurn = jumpballA > jumpballB ? 'A' : 'B';
+            const winner = jumpballA > jumpballB ? centerA.NAME : centerB.NAME;
+            playByPlayLog.innerHTML = `<div class="log-entry text-center font-bold text-gray-300">${getPlayDescription('jumpballWin', { winner: winner })}</div>`;
+
+
+            while (!gameIsOver) {
+                if (timeInQuarter <= 0) {
+                    const currentQuarterScoreA = scoreA - lastScoreA;
+                    const currentQuarterScoreB = scoreB - lastScoreB;
+                    quarterScores.teamA.push(currentQuarterScoreA);
+                    quarterScores.teamB.push(currentQuarterScoreB);
+                    lastScoreA = scoreA;
+                    lastScoreB = scoreB;
+                    renderQuarterScoresTable(quarterScores, teamAname, teamBname);
+
+                    if (quarter < 4) {
+                        playByPlayLog.innerHTML += `<div class="log-entry text-center font-bold text-gray-300">Λήξη ${quarter}ου δεκαλέπτου. Σκορ: ${teamAname} ${scoreA} - ${scoreB} ${teamBname}</div>`;
+                        quarter++;
+                        timeInQuarter += 10 * 60; // Add 10 minutes for next quarter
+                    } else {
+                        if (scoreA !== scoreB) {
+                            gameIsOver = true;
+                        } else {
+                            playByPlayLog.innerHTML += `<div class="log-entry text-center font-bold text-yellow-400">ΙΣΟΠΑΛΙΑ! ΕΝΑΡΞΗ ΠΑΡΑΤΑΣΗΣ!</div>`;
+                            quarter = (typeof quarter === 'number') ? 'OT1' : `OT${parseInt(quarter.replace('OT', '')) + 1}`;
+                            timeInQuarter += 5 * 60; // Add 5 minutes for overtime
+                        }
+                    }
+                }
+                
+                if(gameIsOver) {
+                    break;
+                }
+
+                let offenseTeam, defenseTeam;
+                
+                if (currentTurn === 'A') {
+                    offenseTeam = { name: teamAname, roster: teamA_roster, boxscore: boxscoreA };
+                    defenseTeam = { name: teamBname, roster: teamB_roster, boxscore: boxscoreB };
+                } else {
+                    offenseTeam = { name: teamBname, roster: teamB_roster, boxscore: boxscoreB };
+                    defenseTeam = { name: teamAname, roster: teamA_roster, boxscore: boxscoreA };
+                }
+                
+                const minutes = Math.floor(timeInQuarter / 60);
+                const seconds = Math.floor(timeInQuarter % 60);
+                const timeDisplay = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+                const quarterDisplay = typeof quarter === 'number' ? `Q${quarter}` : quarter;
+
+                
+                const isClutchTime = quarter >= 4 && timeInQuarter <= 120 && Math.abs(scoreA - scoreB) <= 8;
+
+                // --- SMART DEFENSE LOGIC ---
+                let defensiveScheme = { type: 'No Adjustment', focusOnStar: false, starName: null };
+                
+                // Determine Defensive Plan
+                const planChance = Math.random();
+                let cumulativeChance = 0;
+                if (planChance < (cumulativeChance += currentGameParams['61. DefensivePlan_NoAdjustment_Chance'].Value)) defensiveScheme.type = 'No Adjustment';
+                else if (planChance < (cumulativeChance += currentGameParams['62. DefensivePlan_PackThePaint_Chance'].Value)) defensiveScheme.type = 'Pack the Paint';
+                else if (planChance < (cumulativeChance += currentGameParams['63. DefensivePlan_SwitchEverything_Chance'].Value)) defensiveScheme.type = 'Switch Everything';
+                else if (planChance < (cumulativeChance += currentGameParams['64. DefensivePlan_DenyOffScreen_Chance'].Value)) defensiveScheme.type = 'Deny Off-Screen';
+                else if (planChance < (cumulativeChance += currentGameParams['65. DefensivePlan_DropVsPnR_Chance'].Value)) defensiveScheme.type = 'Drop vs PnR';
+                else defensiveScheme.type = 'Hedge vs PnR';
+
+                 // Focus on Star Logic
+                if (focusState.cooldown > 0) {
+                    focusState.cooldown--;
+                } else if (focusState.duration > 0) {
+                    defensiveScheme.focusOnStar = true;
+                    defensiveScheme.starName = focusState.starName;
+                    focusState.duration--;
+                    if (focusState.duration === 0) focusState.cooldown = 2; // Cooldown for 2 possessions
+                } else {
+                    // Decide whether to start focusing
+                    let focusChance = currentGameParams['54. FocusStar_BaseChance'].Value;
+                    const offenseStar = offenseTeam.roster.sort((a,b) => b.OVERALL - a.OVERALL)[0];
+                    if(offenseStar.OVERALL > offenseTeam.roster.sort((a,b) => b.OVERALL - a.OVERALL)[1].OVERALL) focusChance += currentGameParams['55. FocusStar_OverallBonus'].Value;
+                    if(offenseTeam.boxscore[offenseStar.NAME].isHot) focusChance += currentGameParams['56. FocusStar_HotHandBonus'].Value;
+                    if(isClutchTime) focusChance += currentGameParams['57. FocusStar_ClutchTimeBonus'].Value;
+                    if(offenseStar.PlayTypes.includes('Clutch Scorer')) focusChance += currentGameParams['58. FocusStar_ClutchScorerBonus'].Value;
+                    const scoreDiff = currentTurn === 'A' ? scoreB - scoreA : scoreA - scoreB;
+                    if(scoreDiff > 8) focusChance += currentGameParams['59. FocusStar_BlowoutPenalty'].Value;
+
+                    if(Math.random() < focusChance) {
+                        focusState = { team: defenseTeam.name, starName: offenseStar.NAME, duration: currentGameParams['60. FocusStar_Duration'].Value, cooldown: 0 };
+                        defensiveScheme.focusOnStar = true;
+                        defensiveScheme.starName = focusState.starName;
+                    }
+                }
+
+
+
+                const result = simulatePossession(offenseTeam, defenseTeam, currentGameParams, shotClock, isClutchTime, possessionStartLocation, defensiveScheme);
+                let { points = 0, description, outcome, ftAttempts, shooter, fouler, possessionTime } = result;
+                
+                const timeElapsed = possessionTime;
+                timeInQuarter -= timeElapsed;
+                shotClock -= timeElapsed;
+
+                // Stamina depletion for on-court players
+                const staminaDrainRate = 0.5; // Base stamina drain per possession
+                const allOnCourtPlayers = [...teamA_roster, ...teamB_roster];
+                allOnCourtPlayers.forEach(player => {
+                    const staminaDrain = staminaDrainRate * (1 - (player.Motor - 5) * 0.05);
+                    const boxscore = player.Team === 'A' ? boxscoreA : boxscoreB;
+                    if (boxscore[player.NAME]) {
+                         boxscore[player.NAME].stamina = Math.max(0, boxscore[player.NAME].stamina - staminaDrain);
+                    }
+                });
+
+                
+                if (points > 0) {
+                    if (currentTurn === 'A') scoreA += points;
+                    else scoreB += points;
+
+                     // Heat Check Logic
+                    if (shooter.PlayTypes.includes('Heat Check Scorer')) {
+                        if (heatCheckTracker.player === shooter.NAME) {
+                            heatCheckTracker.count++;
+                        } else {
+                            heatCheckTracker = { player: shooter.NAME, count: 1 };
+                        }
+                    } else {
+                        heatCheckTracker = { player: null, count: 0 };
+                    }
+                    offenseTeam.roster.forEach(p => offenseTeam.boxscore[p.NAME].isHot = false); // Reset all
+                    if(heatCheckTracker.count >= 2) {
+                        offenseTeam.boxscore[shooter.NAME].isHot = true;
+                    }
+
+                } else {
+                     heatCheckTracker = { player: null, count: 0 };
+                     offenseTeam.roster.forEach(p => offenseTeam.boxscore[p.NAME].isHot = false);
+                }
+
+                
+                playByPlayLog.innerHTML += `<div class="log-entry"><span class="font-bold text-gray-400">[${timeDisplay} | ${quarterDisplay}]</span> <span class="font-semibold text-blue-400">${offenseTeam.name}:</span> ${description} <span class="text-gray-300">(${scoreA}-${scoreB})</span></div>`;
+
+                if (outcome === 'shooting_foul' || outcome === 'unsportsmanlike_foul' || outcome === 'and_one') {
+                    for (let i = 0; i < ftAttempts; i++) {
+                        if (delay > 0) await new Promise(resolve => setTimeout(resolve, delay / 2));
+                        let ftMade = Math.random() < currentGameParams['17. FT%'].Value + (shooter.FT - 5) * 0.02;
+                        let ftDesc = '';
+                        if (ftMade) {
+                            if (currentTurn === 'A') scoreA++; else scoreB++;
+                            offenseTeam.boxscore[shooter.NAME].FTIN++;
+                            ftDesc = `Εύστοχη ${i+1}η βολή.`;
+                        } else {
+                            offenseTeam.boxscore[shooter.NAME].FTOUT++;
+                            ftDesc = `Άστοχη ${i+1}η βολή.`;
+                        }
+                        playByPlayLog.innerHTML += `<div class="log-entry"><span class="font-bold text-gray-400">[${timeDisplay} | ${quarterDisplay}]</span> <span class="font-semibold text-blue-400">${offenseTeam.name}:</span> ${ftDesc} <span class="text-gray-300">(${scoreA}-${scoreB})</span></div>`;
+                        scoreAEl.textContent = scoreA;
+                        scoreBEl.textContent = scoreB;
+                        playByPlayLog.scrollTop = playByPlayLog.scrollHeight;
+                    }
+                }
+                
+                // --- SHOT CLOCK AND POSSESSION LOGIC ---
+                switch(outcome) {
+                    case 'made_shot':
+                    case 'dreb':
+                    case 'turnover':
+                    case 'steal':
+                    case 'shooting_foul':
+                    case 'and_one':
+                    case 'shot_clock_violation':
+                        currentTurn = (currentTurn === 'A') ? 'B' : 'A';
+                        shotClock = 24;
+                        possessionStartLocation = 'backcourt'; // After score or full possession change
+                        break;
+                    case 'oreb':
+                    case 'non_shooting_foul':
+                        shotClock = Math.min(shotClock, 14);
+                        possessionStartLocation = 'inbound';
+                        break;
+                    case 'unsportsmanlike_foul':
+                        shotClock = 14; 
+                        possessionStartLocation = 'inbound';
+                        // Possession does not change turn
+                        playByPlayLog.innerHTML += `<div class="log-entry text-yellow-400"><span class="font-bold text-gray-400">[${timeDisplay}]</span> Η ομάδα ${offenseTeam.name} διατηρεί την κατοχή.</div>`;
+                        break;
+                }
+
+                scoreAEl.textContent = scoreA;
+                scoreBEl.textContent = scoreB;
+                playByPlayLog.scrollTop = playByPlayLog.scrollHeight;
+                
+                if (delay > 0) {
+                    renderFullBoxscore(teamAname, teamBname, boxscoreA, boxscoreB);
+                    await new Promise(resolve => setTimeout(resolve, delay));
+                }
+            }
+
+            playByPlayLog.innerHTML += `<div class="log-entry bg-blue-800 text-white font-bold text-center">ΤΕΛΟΣ ΑΓΩΝΑ! Τελικό Σκορ: ${teamAname} ${scoreA} - ${scoreB} ${teamBname}</div>`;
+            
+            renderFullBoxscore(teamAname, teamBname, boxscoreA, boxscoreB);
+            
+            simulateBtn.disabled = false;
+        }
+
+        function renderFullBoxscore(teamAName, teamBName, boxscoreA, boxscoreB) {
+            const calculatePIR = (player) => {
+                const twoPointAttempts = (player['2PIN'] || 0) + (player['2POUT'] || 0);
+                const threePointAttempts = (player['3PIN'] || 0) + (player['3POUT'] || 0);
+                const ftAttempts = (player.FTIN || 0) + (player.FTOUT || 0);
+                return (player.PTS + player.REB + player.AS + player.ST + player.BL + player.FF) - 
+                       ((twoPointAttempts - player['2PIN']) + (threePointAttempts - player['3PIN']) + (ftAttempts - player.FTIN) + player.TOs + player.FC);
+            };
+
+            const renderTeamTable = (tableId, headerId, teamName, playersData) => {
+                const table = document.getElementById(tableId);
+                const header = document.getElementById(headerId);
+                const body = table.querySelector('tbody');
+                const footer = table.querySelector('tfoot');
+                
+                header.textContent = teamName;
+                body.innerHTML = '';
+                footer.innerHTML = '';
+
+                const totals = { '2PIN': 0, '2POUT': 0, '3PIN': 0, '3POUT': 0, FTIN: 0, FTOUT: 0, AS: 0, REB: 0, ST: 0, BL: 0, FF: 0, FC: 0, TOs: 0, PTS: 0, PIR: 0 };
+                const players = Object.values(playersData);
+
+                players.forEach(p => {
+                    p.PTS = (p['2PIN'] || 0) * 2 + (p['3PIN'] || 0) * 3 + (p.FTIN || 0);
+                    p.PIR = calculatePIR(p);
+
+                    const row = body.insertRow();
+                    row.innerHTML = `
+                        <td class="font-bold">${p.NAME}</td>
+                        <td>${p['2PIN']}</td><td>${(p['2PIN'] || 0) + (p['2POUT'] || 0)}</td>
+                        <td>${p['3PIN']}</td><td>${(p['3PIN'] || 0) + (p['3POUT'] || 0)}</td>
+                        <td>${p.FTIN}</td><td>${(p.FTIN || 0) + (p.FTOUT || 0)}</td>
+                        <td>${p.AS}</td><td>${p.REB}</td>
+                        <td>${p.ST}</td><td>${p.BL}</td>
+                        <td>${p.FF}</td><td>${p.FC}</td>
+                        <td>${p.TOs}</td><td class="font-bold">${p.PIR}</td>
+                        <td class="font-bold">${p.PTS}</td>
+                    `;
+                    
+                    for(const key in totals) {
+                        if (p.hasOwnProperty(key) && typeof p[key] === 'number') {
+                           totals[key] += p[key];
+                        }
+                    }
+                });
+                
+                totals.PTS = (totals['2PIN'] * 2) + (totals['3PIN'] * 3) + totals.FTIN;
+                totals.PIR = calculatePIR(totals);
+
+                const totalsRow = footer.insertRow();
+                totalsRow.innerHTML = `
+                    <td class="font-bold">ΣΥΝΟΛΟ</td>
+                    <td>${totals['2PIN']}</td><td>${totals['2PIN'] + totals['2POUT']}</td>
+                    <td>${totals['3PIN']}</td><td>${totals['3PIN'] + totals['3POUT']}</td>
+                    <td>${totals.FTIN}</td><td>${totals.FTIN + totals.FTOUT}</td>
+                    <td>${totals.AS}</td><td>${totals.REB}</td>
+                    <td>${totals.ST}</td><td>${totals.BL}</td>
+                    <td>${totals.FF}</td><td>${totals.FC}</td>
+                    <td>${totals.TOs}</td><td class="font-bold">${totals.PIR}</td>
+                    <td class="font-bold">${totals.PTS}</td>
+                `;
+            };
+
+            renderTeamTable('boxscoreTableA', 'boxscoreTeamAHeader', teamAName, boxscoreA);
+            renderTeamTable('boxscoreTableB', 'boxscoreTeamBHeader', teamBName, boxscoreB);
+        }
+
+        function renderQuarterScoresTable(scores, teamAName, teamBName) {
+            const table = document.getElementById('quarterScoresTable');
+            const thead = table.querySelector('thead');
+            const tbody = table.querySelector('tbody');
+
+            thead.innerHTML = '';
+            tbody.innerHTML = '';
+
+            const headerRow = thead.insertRow();
+            headerRow.innerHTML = '<th>Ομάδα</th>';
+            for (let i = 0; i < scores.teamA.length; i++) {
+                const quarterLabel = i < 4 ? `${i + 1}` : `OT${i - 3}`;
+                headerRow.innerHTML += `<th>${quarterLabel}</th>`;
+            }
+             if (scores.teamA.length > 0) {
+                 headerRow.innerHTML += '<th>Σύνολο</th>';
+             }
+
+
+            const teamARow = tbody.insertRow();
+            teamARow.innerHTML = `<td>${teamAName}</td>`;
+            let totalA = 0;
+            scores.teamA.forEach(score => {
+                teamARow.innerHTML += `<td>${score}</td>`;
+                totalA += score;
+            });
+             if (scores.teamA.length > 0) {
+                 teamARow.innerHTML += `<td>${totalA}</td>`;
+             }
+
+            const teamBRow = tbody.insertRow();
+            teamBRow.innerHTML = `<td>${teamBName}</td>`;
+            let totalB = 0;
+            scores.teamB.forEach(score => {
+                teamBRow.innerHTML += `<td>${score}</td>`;
+                totalB += score;
+            });
+             if (scores.teamB.length > 0) {
+                 teamBRow.innerHTML += `<td>${totalB}</td>`;
+             }
+        }
+
+        function renderRoster() {
+            const rosterContainerA = document.getElementById('rosterTableAContainer');
+            const rosterContainerB = document.getElementById('rosterTableBContainer');
+            const allSkills = ['DRIVE', 'MID', 'FIN', 'POST', '3P', 'FT', 'REB', 'PAS', 'DRI', 'DEF', 'STL', 'BLK', 'SPD', 'STR', 'VER', 'Motor', 'Hustle', 'AGGR', 'MentalToughness', 'IQ'];
+
+            const renderTeam = (team, container) => {
+                container.innerHTML = '';
+                const teamPlayers = rosterData.filter(p => p.Team === team);
+                
+                teamPlayers.forEach(player => {
+                     // NEW LOGIC: Assign default play types if empty
+                    if (!player.PlayTypes || player.PlayTypes.length === 0) {
+                        player.PlayTypes = defaultPlayTypesByPosition[player.POS] || [];
+                    }
+
+                    const playerCard = document.createElement('div');
+                    playerCard.className = 'bg-[#2d3748] p-4 rounded-xl shadow-md mb-4';
+                    
+                    const overall = calculateOverall(player).toFixed(1);
+                    player.OVERALL = overall;
+                    playerCard.innerHTML = `
+                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-4">
+                            <div class="flex flex-col">
+                                <label class="text-xs text-gray-400 mb-1">Όνομα:</label>
+                                <input type="text" class="input-text w-full" value="${player.NAME}" data-name-input="${player.NAME}">
+                            </div>
+                            <div class="flex items-end">
+                                <label class="text-xs text-gray-400 mr-2">Overall:</label>
+                                <span class="bg-gray-600 text-center font-bold px-2 py-1 rounded-lg overall-score">${overall}</span>
+                                <label class="text-xs text-gray-400 mx-2">Θέση:</label>
+                                <span class="text-sm font-bold">${player.POS}</span>
+                            </div>
+                            <div class="flex flex-col">
+                                <label class="text-xs text-gray-400 mb-1">Play Types (έως 5):</label>
+                                <div class="select-multiple-container">
+                                    <div class="flex flex-wrap gap-1 p-2 bg-[#4a5568] rounded-md cursor-pointer play-type-selector" data-name="${player.NAME}">
+                                        ${player.PlayTypes.map(pt => `<span class="bg-gray-700 text-xs px-2 py-1 rounded-full">${pt}</span>`).join('')}
+                                        ${player.PlayTypes.length === 0 ? `<span class="text-gray-400 text-xs flex-1 text-center">Επιλέξτε...</span>` : ''}
+                                    </div>
+                                    <div class="select-multiple-dropdown">
+                                        ${playTypes.map(category => `
+                                            <div class="play-type-category">${category.category}</div>
+                                            ${category.types.map(pt => `<div class="select-multiple-option ${player.PlayTypes.includes(pt) ? 'selected-option' : ''}" data-value="${pt}">${pt}</div>`).join('')}
+                                        `).join('')}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
+                            <div class="flex items-center">
+                                <label class="text-xs text-gray-400 mr-2">Ύψος (cm):</label>
+                                <input type="number" class="input-number w-16" min="170" max="230" value="${player.HEIGHT}" data-name="${player.NAME}" data-skill="HEIGHT">
+                            </div>
+                            <div class="flex items-center">
+                                <label class="text-xs text-gray-400 mr-2">Βάρος (kg):</label>
+                                <input type="number" class="input-number w-16" min="70" max="130" value="${player.WEIGHT}" data-name="${player.NAME}" data-skill="WEIGHT">
+                            </div>
+                        </div>
+                        <div class="flex flex-col">
+                            <label class="text-xs text-gray-400 mb-2">Skills:</label>
+                            <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2 text-sm">
+                                ${allSkills.map(skill => `
+                                    <div class="flex items-center">
+                                        <label class="text-xs text-gray-400 mr-1">${skillLabels[skill] || skill}:</label>
+                                        <input type="number" class="input-number w-12" min="1" max="10" value="${player[skill]}" data-name="${player.NAME}" data-skill="${skill}">
+                                    </div>
+                                `).join('')}
+                            </div>
+                        </div>
+                    `;
+                    container.appendChild(playerCard);
+                });
+            };
+            
+            const skillLabels = {
+                'MentalToughness': 'MENTAL', 'Hustle': 'HUS', 'Motor': 'MOT', 'POST': 'POST', 'MID': 'MID', 'DRIVE': 'DRV', 'FIN': 'FIN', 'SPD': 'SPD', 'STR': 'STR', 'VER': 'VER', 'AGGR': 'AGGR'
+            };
+
+            renderTeam('A', rosterContainerA);
+            renderTeam('B', rosterContainerB);
+            
+            function updateTeamOveralls() {
+                const teamA_roster = rosterData.filter(p => p.Team === 'A');
+                const teamB_roster = rosterData.filter(p => p.Team === 'B');
+
+                let teamA_totalOverall = 0;
+                teamA_roster.forEach(p => {
+                    teamA_totalOverall += calculateOverall(p);
+                });
+                
+                let teamB_totalOverall = 0;
+                 teamB_roster.forEach(p => {
+                    teamB_totalOverall += calculateOverall(p);
+                });
+
+                const teamA_avgOverall = (teamA_totalOverall / teamA_roster.length).toFixed(1);
+                const teamB_avgOverall = (teamB_totalOverall / teamB_roster.length).toFixed(1);
+
+                document.getElementById('teamA_AvgOverall_roster').textContent = teamA_avgOverall;
+                document.getElementById('teamB_AvgOverall_roster').textContent = teamB_avgOverall;
+                document.getElementById('teamA_AvgOverall_pbp').textContent = `OVR: ${teamA_avgOverall}`;
+                document.getElementById('teamB_AvgOverall_pbp').textContent = `OVR: ${teamB_avgOverall}`;
+            }
+
+            updateTeamOveralls();
+
+            document.querySelectorAll('#tab-roster input').forEach(input => {
+                input.addEventListener('input', (e) => {
+                    const playerName = e.target.dataset.name || e.target.dataset.nameInput;
+                    const player = rosterData.find(p => p.NAME === playerName);
+                    if (!player) return;
+                    if (e.target.dataset.nameInput !== undefined) {
+                        const oldName = e.target.dataset.nameInput;
+                        const newName = e.target.value;
+                        const playerToUpdate = rosterData.find(p => p.NAME === oldName);
+                        if(playerToUpdate) {
+                            playerToUpdate.NAME = newName;
+                            e.target.dataset.nameInput = newName;
+                            e.target.closest('.rounded-xl').querySelectorAll('[data-name]').forEach(skillInput => {
+                                skillInput.dataset.name = newName;
+                            });
+                        }
+                    } else {
+                        const skillName = e.target.dataset.skill;
+                        const value = parseFloat(e.target.value);
+                        if (skillName === 'HEIGHT') player.HEIGHT = value;
+                        else if (skillName === 'WEIGHT') player.WEIGHT = value;
+                        else {
+                            if (!isNaN(value) && value >= 1 && value <= 10) {
+                                player[skillName] = value;
+                                const overallEl = e.target.closest('.rounded-xl').querySelector('.overall-score');
+                                player.OVERALL = calculateOverall(player).toFixed(1); // Recalculate and update
+                                overallEl.textContent = player.OVERALL;
+                                updateTeamOveralls();
+                            }
+                        }
+                    }
+                });
+            });
+
+            document.querySelectorAll('.play-type-selector').forEach(selector => {
+                const dropdown = selector.nextElementSibling;
+                const playerName = selector.dataset.name;
+                const player = rosterData.find(p => p.NAME === playerName);
+                selector.addEventListener('click', () => dropdown.classList.toggle('open'));
+                document.addEventListener('click', (e) => {
+                    if (!selector.contains(e.target) && !dropdown.contains(e.target)) {
+                        dropdown.classList.remove('open');
+                    }
+                });
+                dropdown.querySelectorAll('.select-multiple-option').forEach(option => {
+                    option.addEventListener('click', (e) => {
+                        const selectedPlayType = e.target.dataset.value;
+                        if (player.PlayTypes.includes(selectedPlayType)) {
+                            player.PlayTypes = player.PlayTypes.filter(pt => pt !== selectedPlayType);
+                            option.classList.remove('selected-option');
+                        } else {
+                            if (player.PlayTypes.length < 5) {
+                                player.PlayTypes.push(selectedPlayType);
+                                option.classList.add('selected-option');
+                            }
+                        }
+                        const tagsContainer = selector;
+                        tagsContainer.innerHTML = '';
+                        player.PlayTypes.forEach(pt => {
+                            const tag = document.createElement('span');
+                            tag.className = 'bg-gray-700 text-xs px-2 py-1 rounded-full';
+                            tag.textContent = pt;
+                            tagsContainer.appendChild(tag);
+                        });
+                        if (player.PlayTypes.length === 0) {
+                            tagsContainer.innerHTML = `<span class="text-gray-400 text-xs flex-1 text-center">Επιλέξτε...</span>`;
+                        }
+                        e.stopPropagation();
+                    });
+                });
+            });
+        }
+        
+        function renderParamsTable() {
+            const paramsTableBody = document.getElementById('paramsTable').querySelector('tbody');
+            paramsTableBody.innerHTML = '';
+            const paramKeys = Object.keys(paramsData).sort((a, b) => {
+                const numA = parseInt(a.split('.')[0]);
+                const numB = parseInt(b.split('.')[0]);
+                return numA - numB;
+            });
+
+            paramKeys.forEach(paramKey => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td class="font-bold">${paramKey}</td>
+                    <td><input type="number" step="0.01" class="input-number w-24 param-input" data-param="${paramKey}" value="${paramsData[paramKey].Value}"></td>
+                    <td>${paramsData[paramKey].Desc}</td>
+                `;
+                paramsTableBody.appendChild(row);
+            });
+            document.querySelectorAll('.param-input').forEach(input => {
+                input.addEventListener('input', (e) => {
+                    const paramName = e.target.dataset.param;
+                    const value = parseFloat(e.target.value);
+                    if (!isNaN(value) && paramsData[paramName]) {
+                        paramsData[paramName].Value = value;
+                    }
+                });
+            });
+        }
+
+
+        function init() {
+            loading.classList.add('hidden');
+            app.classList.remove('hidden');
+            renderRoster();
+            renderParamsTable();
+            tabButtons.forEach(button => {
+                button.addEventListener('click', () => {
+                    tabButtons.forEach(btn => btn.classList.remove('active'));
+                    tabContents.forEach(content => content.classList.add('hidden'));
+                    button.classList.add('active');
+                    document.getElementById(button.id.replace('-btn', '')).classList.remove('hidden');
+                });
+            });
+            simulateBtn.addEventListener('click', runSimulation);
+        }
+
+        window.onload = init;
+    </script>
+</body>
+</html>
+

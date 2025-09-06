@@ -1,0 +1,29 @@
+Σημειώσεις & Επόμενα Βήματα
+1.	Αναβάθμιση & Fine-Tuning Skills/Play Types (ΝΕΟ - Άμεση Προτεραιότητα):
+o	a. Επίδραση Finishing
+o	b. cutter
+o	c. glue guy
+o	d. mental toughness
+o	e. smart shot logic
+o	f. FT Shooting (Δυσκολία)
+o	g. PnR Handler (Play Type)
+o	h. Speed (Σε συγκεκριμένες φάσεις)
+o	i. Defensive Stopper
+o	g. Floor General
+o	k. Perimeter Pest
+o	l. Fadeaway shot (Dirk Nowitzki)
+o	m. Pump Fakes Perimeter & Post
+2.	Αναβάθμιση Ρεαλισμού Skills & Play Types:
+o	a. Clutch Time: Προσθήκη έξτρα πιθανότητας για φάουλ/λάθη, ειδική λογική για buzzer-beaters, αλλαγή ορίου ενεργοποίησης (π.χ. ≤ 6π).
+o	b. Αντιαθλητικά & Τεχνικές Ποινές: Έλεγχος για πιο ενεργό/εμφανή ρόλο.
+o	c. Καρφώματα (Dunks): Εισαγωγή λογικής για το πότε ένας παίκτης καρφώνει, με βάση Ύψος, Βάρος & Αθλητικότητα.
+o	d. Extra Ρεαλισμός στο Play-by-Play: Προσθήκη περιγραφών που αντικατοπτρίζουν τις τακτικές (π.χ. "double team", "pack the paint").
+3.	Περιορισμοί για καλύτερο ρεαλισμό
+4.	Παράγοντας Τύχης (Luck Factor)
+5.	Εμπλουτισμός του play by play
+6.	Σελίδα Ομάδας & Ομαδικά Overalls/Skills (Team Page/Tendencies)
+7.	Ρεαλισμός (Timeouts, coaches, home court adv, ομαδικό momentum, defense matchups / Λογική Θέσης Μπάλας - Ζώνες Γηπέδου)
+8.	TESTING (play by play & paramsdata) - Συνεχής διαδικασία & Υψηλή Προτεραιότητα
+9.	Δυνατότητα αποθήκευσης/εισαγωγής ρόστερ, παικτών & φωτογραφιών
+10.	Τύπος αποθήκευσης του παιχνιδιού
+
